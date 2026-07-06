@@ -1,0 +1,34 @@
+# ================== Visual Studio ==================
+.vs/
+.vscode/
+
+# ================== Build & Binaries ==================
+**/bin/
+**/obj/
+**/out/
+**/publish/
+**/Release/
+**/Debug/
+
+# ================== ASP.NET Core ==================
+appsettings.Development.json
+**/Properties/launchSettings.json
+secrets.json
+*.user
+*.suo
+
+# ================== NuGet & Packages ==================
+**/packages/
+**/*.nupkg
+**/*.snupkg
+
+# ================== Logs & Temp ==================
+**/*.log
+logs/
+**/temp/
+
+# ================== Other ==================
+.DS_Store
+Thumbs.db
+*.pdb
+PROJECT_STATE.txt
