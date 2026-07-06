@@ -1,0 +1,37 @@
+﻿<Project Sdk="Microsoft.NET.Sdk">
+
+  <ItemGroup>
+    <ProjectReference Include="..\TaskFlow.Domain\TaskFlow.Domain.csproj" />
+  </ItemGroup>
+
+  <ItemGroup>
+    <PackageReference Include="FluentValidation" Version="12.1.1" />
+    <PackageReference Include="MediatR" Version="14.1.0" />
+  </ItemGroup>
+
+  <ItemGroup>
+    <Folder Include="Abstractions\Authentication\" />
+    <Folder Include="Abstractions\Messaging\" />
+    <Folder Include="Abstractions\Clock\" />
+    <Folder Include="Abstractions\Persistence\" />
+    <Folder Include="Abstractions\Services\" />
+    <Folder Include="Behaviors\" />
+    <Folder Include="DependencyInjection\" />
+    <Folder Include="Comments\" />
+    <Folder Include="Organizations\Commands\" />
+    <Folder Include="Organizations\Queries\" />
+    <Folder Include="Projects\Commands\" />
+    <Folder Include="Projects\Queries\" />
+    <Folder Include="Tasks\Commands\" />
+    <Folder Include="Tasks\Queries\" />
+    <Folder Include="Users\Commands\" />
+    <Folder Include="Users\Queries\" />
+  </ItemGroup>
+
+  <PropertyGroup>
+    <TargetFramework>net10.0</TargetFramework>
+    <ImplicitUsings>enable</ImplicitUsings>
+    <Nullable>enable</Nullable>
+  </PropertyGroup>
+
+</Project>
