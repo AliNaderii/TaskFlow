@@ -5,18 +5,15 @@
   </ItemGroup>
 
   <ItemGroup>
-    <PackageReference Include="FluentValidation" Version="12.1.1" />
-    <PackageReference Include="MediatR" Version="14.1.0" />
+    <PackageReference Include="FluentValidation.DependencyInjectionExtensions" Version="12.1.1" />
+    <PackageReference Include="MediatR" Version="14.2.0" />
   </ItemGroup>
 
   <ItemGroup>
     <Folder Include="Abstractions\Authentication\" />
-    <Folder Include="Abstractions\Messaging\" />
     <Folder Include="Abstractions\Clock\" />
     <Folder Include="Abstractions\Persistence\" />
     <Folder Include="Abstractions\Services\" />
-    <Folder Include="Behaviors\" />
-    <Folder Include="DependencyInjection\" />
     <Folder Include="Comments\" />
     <Folder Include="Organizations\Commands\" />
     <Folder Include="Organizations\Queries\" />

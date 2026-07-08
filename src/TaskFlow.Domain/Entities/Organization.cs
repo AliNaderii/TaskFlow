@@ -2,30 +2,24 @@ using TaskFlow.Domain.Common;
 using TaskFlow.Domain.Entities;
 using TaskFlow.Domain.Errors;
 using TaskFlow.Domain.Constants;
+using TaskFlow.Domain.ValueObjects;
 
 public class Organization : AuditableEntity
 {
     private readonly List<Membership> _memberships = new();
     public IReadOnlyCollection<Membership> Memberships => _memberships.AsReadOnly();
-    public string Name { get; private set; } = null!;
+    public OrganizationName Name { get; private set; }
 
     private Organization() { }
 
-    private Organization(string name)
+    private Organization(OrganizationName name)
     {
         Name = name;
     }
 
-    public static Result<Organization> Create(string name)
+    public static Result<Organization> Create(OrganizationName name)
     {
-        if (string.IsNullOrWhiteSpace(name))
-            return Result<Organization>.Failure(OrganizationErrors.NameIsEmpty);
-
-        if (name.Length > OrganizationConstants.MaxNameLength)
-        {
-            return Result<Organization>.Failure(OrganizationErrors.NameTooLong);
-        }
-
-        return Result<Organization>.Success(new Organization(name));
+        var organization = new Organization(name);
+        return Result<Organization>.Success(organization);
     }
 }

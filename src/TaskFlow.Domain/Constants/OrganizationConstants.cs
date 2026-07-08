@@ -2,5 +2,6 @@
 
 public static class OrganizationConstants
 {
-    public const int MaxNameLength = 100;
+    public const int NameMinLength = 3;
+    public const int NameMaxLength = 100;
 }
