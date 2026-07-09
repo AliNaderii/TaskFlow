@@ -5,6 +5,8 @@ using TaskFlow.Domain.Common;
 using TaskFlow.Domain.Errors;
 using TaskFlow.Domain.ValueObjects;
 
+namespace TaskFlow.Application.Organizations.Commands.CreateOrganization;
+
 public sealed class CreateOrganizationCommandHandler
     : ICommandHandler<CreateOrganizationCommand, Guid>
 {
