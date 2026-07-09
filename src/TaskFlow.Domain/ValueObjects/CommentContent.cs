@@ -22,12 +22,12 @@ public sealed record CommentContent
 
         value = value.Trim();
 
-        if (value.Length < CommnetConstants.ContentMinLength)
+        if (value.Length < CommentConstants.ContentMinLength)
         {
             return Result<CommentContent>.Failure(CommentErrors.ContentTooShort);
         }
 
-        if (value.Length < CommnetConstants.ContentMaxLength)
+        if (value.Length > CommentConstants.ContentMaxLength)
         {
             return Result<CommentContent>.Failure(CommentErrors.ContentTooLong);
         }
