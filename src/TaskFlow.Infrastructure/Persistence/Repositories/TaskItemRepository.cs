@@ -4,50 +4,49 @@ using TaskFlow.Domain.Entities;
 
 namespace TaskFlow.Infrastructure.Persistence.Repositories;
 
-internal sealed class ProjectRepository : IProjectRepository
+internal sealed class TaskItemRepository : ITaskItemRepository
 {
     private readonly ApplicationDbContext _context;
 
-    public ProjectRepository(ApplicationDbContext context)
+    public TaskItemRepository(ApplicationDbContext context)
     {
         _context = context;
     }
 
-    public async Task<Project?> GetByIdAsync(
+    public async Task<TaskItem?> GetByIdAsync(
         Guid id,
         CancellationToken cancellationToken = default)
     {
-        return await _context.Projects
+        return await _context.TaskItems
             .FirstOrDefaultAsync(
                 x => x.Id == id,
                 cancellationToken);
     }
 
-    public async Task<IReadOnlyList<Project>> GetByOrganizationIdAsync(
-        Guid organizationId,
+    public async Task<IReadOnlyList<TaskItem>> GetByProjectIdAsync(
+        Guid projectId,
         CancellationToken cancellationToken = default)
     {
-        return await _context.Projects
-            .Where(x => x.OrganizationId == organizationId)
+        return await _context.TaskItems
+            .Where(x => x.ProjectId == projectId)
             .ToListAsync(cancellationToken);
     }
 
-    public async Task<bool> ExistsAsync(
-        Guid id,
+    public async Task<IReadOnlyList<TaskItem>> GetAssignedToUserAsync(
+        Guid userId,
         CancellationToken cancellationToken = default)
     {
-        return await _context.Projects
-            .AnyAsync(
-                x => x.Id == id,
-                cancellationToken);
+        return await _context.TaskItems
+            .Where(x => x.AssigneeUserId == userId)
+            .ToListAsync(cancellationToken);
     }
 
     public async Task AddAsync(
-        Project project,
+        TaskItem taskItem,
         CancellationToken cancellationToken = default)
     {
-        await _context.Projects.AddAsync(
-            project,
+        await _context.TaskItems.AddAsync(
+            taskItem,
             cancellationToken);
     }
 }
