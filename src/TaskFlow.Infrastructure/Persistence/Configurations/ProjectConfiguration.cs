@@ -41,5 +41,18 @@ internal sealed class ProjectConfiguration : IEntityTypeConfiguration<Project>
         builder.Property(x => x.UpdatedAt);
 
         builder.Property(x => x.ArchivedAt);
+    
+        builder.HasOne(x => x.Organization)
+            .WithMany(x => x.Projects)
+            .HasForeignKey(x => x.OrganizationId)
+            .OnDelete(DeleteBehavior.Restrict);
+        
+        builder.HasMany(x => x.Tasks)
+            .WithOne(x => x.Project)
+            .HasForeignKey(x => x.ProjectId)
+            .OnDelete(DeleteBehavior.Restrict);
+        
+        builder.Navigation(x => x.Tasks)
+            .UsePropertyAccessMode(PropertyAccessMode.Field);
     }
 }

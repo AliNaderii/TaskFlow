@@ -39,5 +39,15 @@ internal sealed class CommentConfiguration : IEntityTypeConfiguration<Comment>
         builder.Property(x => x.UpdatedAt);
 
         builder.Property(x => x.ArchivedAt);
+
+        builder.HasOne(x => x.Task)
+            .WithMany(x => x.Comments)
+            .HasForeignKey(x => x.TaskId)
+            .OnDelete(DeleteBehavior.Restrict);
+        
+        builder.HasOne(x => x.Author)
+            .WithMany(x => x.Comments)
+            .HasForeignKey(x => x.AuthorUserId)
+            .OnDelete(DeleteBehavior.Restrict);
     }
 }

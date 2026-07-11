@@ -11,6 +11,18 @@ public class User : AuditableEntity
     public DisplayName DisplayName { get; private set; } = null!;
     public bool IsActive { get; private set; }
 
+    private readonly List<Membership> _memberships = [];
+    public IReadOnlyCollection<Membership> Memberships => _memberships.AsReadOnly();
+
+    private readonly List<TaskItem> _createdTasks = [];
+    public IReadOnlyCollection<TaskItem> CreatedTasks => _createdTasks.AsReadOnly();
+
+    private readonly List<TaskItem> _assignedTasks = [];
+    public IReadOnlyCollection<TaskItem> AssignedTasks => _assignedTasks.AsReadOnly();
+
+    private readonly List<Comment> _comments = [];
+    public IReadOnlyCollection<Comment> Comments => _comments.AsReadOnly();
+
     private User()
     {
         // Required by EF

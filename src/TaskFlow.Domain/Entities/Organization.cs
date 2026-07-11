@@ -6,9 +6,14 @@ using TaskFlow.Domain.ValueObjects;
 
 public class Organization : AuditableEntity
 {
-    private readonly List<Membership> _memberships = new();
+    public OrganizationName Name { get; private set; } = null!;
+    
+    private readonly List<Membership> _memberships = [];
     public IReadOnlyCollection<Membership> Memberships => _memberships.AsReadOnly();
-    public OrganizationName Name { get; private set; }
+
+    private readonly List<Project> _projects = [];
+    public IReadOnlyCollection<Project> Projects => _projects.AsReadOnly();
+
 
     private Organization() { }
 

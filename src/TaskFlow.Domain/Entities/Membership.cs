@@ -9,6 +9,8 @@ public class Membership : AuditableEntity
     public Guid OrganizationId { get; private set; }
     public MembershipRole Role { get; private set; }
     public MembershipStatus Status { get; private set; }
+    public User User { get; private set; } = null!;
+    public Organization Organization { get; private set; } = null!;
 
     private Membership() { }
 

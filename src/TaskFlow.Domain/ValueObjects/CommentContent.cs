@@ -13,7 +13,7 @@ public sealed record CommentContent
         Value = value;
     }
 
-    public static Result<CommentContent> Create(string? value)
+    public static Result<CommentContent> Create(string value)
     {
         if (string.IsNullOrWhiteSpace(value))
         {

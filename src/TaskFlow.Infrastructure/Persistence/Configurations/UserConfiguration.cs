@@ -40,5 +40,37 @@ internal sealed class UserConfiguration : IEntityTypeConfiguration<User>
 
         builder.HasIndex(x => x.Email)
             .IsUnique();
+        
+        builder.HasMany(x => x.Memberships)
+            .WithOne(x => x.User)
+            .HasForeignKey(x => x.UserId)
+            .OnDelete(DeleteBehavior.Restrict);
+
+        builder.Navigation(x => x.Memberships)
+            .UsePropertyAccessMode(PropertyAccessMode.Field);
+        
+        builder.HasMany(x => x.CreatedTasks)
+            .WithOne(x => x.Creator)
+            .HasForeignKey(x => x.CreatorUserId)
+            .OnDelete(DeleteBehavior.Restrict);
+
+        builder.Navigation(x => x.CreatedTasks)
+            .UsePropertyAccessMode(PropertyAccessMode.Field);
+        
+        builder.HasMany(x => x.AssignedTasks)
+            .WithOne(x => x.Assignee)
+            .HasForeignKey(x => x.AssigneeUserId)
+            .OnDelete(DeleteBehavior.Restrict);
+
+        builder.Navigation(x => x.AssignedTasks)
+            .UsePropertyAccessMode(PropertyAccessMode.Field);
+        
+        builder.HasMany(x => x.Comments)
+            .WithOne(x => x.Author)
+            .HasForeignKey(x => x.AuthorUserId)
+            .OnDelete(DeleteBehavior.Restrict);
+
+        builder.Navigation(x => x.Comments)
+            .UsePropertyAccessMode(PropertyAccessMode.Field);
     }
 }

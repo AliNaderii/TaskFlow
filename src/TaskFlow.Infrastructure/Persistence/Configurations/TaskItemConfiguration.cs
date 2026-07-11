@@ -56,5 +56,28 @@ internal sealed class TaskItemConfiguration : IEntityTypeConfiguration<TaskItem>
         builder.Property(x => x.UpdatedAt);
 
         builder.Property(x => x.ArchivedAt);
+
+        builder.HasOne(x => x.Project)
+            .WithMany(x => x.Tasks)
+            .HasForeignKey(x => x.ProjectId)
+            .OnDelete(DeleteBehavior.Restrict);
+        
+        builder.HasOne(x => x.Creator)
+            .WithMany(x => x.CreatedTasks)
+            .HasForeignKey(x => x.CreatorUserId)
+            .OnDelete(DeleteBehavior.Restrict);
+        
+        builder.HasOne(x => x.Assignee)
+            .WithMany(x => x.AssignedTasks)
+            .HasForeignKey(x => x.AssigneeUserId)
+            .OnDelete(DeleteBehavior.Restrict);
+        
+        builder.HasMany(x => x.Comments)
+            .WithOne(x => x.Task)
+            .HasForeignKey(x => x.TaskId)
+            .OnDelete(DeleteBehavior.Restrict);
+
+        builder.Navigation(x => x.Comments)
+            .UsePropertyAccessMode(PropertyAccessMode.Field);
     }
 }

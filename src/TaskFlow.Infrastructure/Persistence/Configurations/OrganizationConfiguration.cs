@@ -30,5 +30,21 @@ internal sealed class OrganizationConfiguration : IEntityTypeConfiguration<Organ
         builder.Property(x => x.UpdatedAt);
 
         builder.Property(x => x.ArchivedAt);
+
+        builder.HasMany(x => x.Projects)
+            .WithOne(x => x.Organization)
+            .HasForeignKey(x => x.OrganizationId)
+            .OnDelete(DeleteBehavior.Restrict);
+        
+        builder.Navigation(x => x.Projects)
+            .UsePropertyAccessMode(PropertyAccessMode.Field);
+
+        builder.HasMany(x => x.Memberships)
+            .WithOne(x => x.Organization)
+            .HasForeignKey(x => x.OrganizationId)
+            .OnDelete(DeleteBehavior.Restrict);
+        
+        builder.Navigation(x => x.Memberships)
+            .UsePropertyAccessMode(PropertyAccessMode.Field);
     }
 }

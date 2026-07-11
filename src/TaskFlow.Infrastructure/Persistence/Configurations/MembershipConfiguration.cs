@@ -34,10 +34,20 @@ internal sealed class MembershipConfiguration : IEntityTypeConfiguration<Members
         builder.Property(x => x.ArchivedAt);
 
         builder.HasIndex(x => new
-        {
-            x.UserId,
-            x.OrganizationId
-        })
-        .IsUnique();
+            {
+                x.UserId,
+                x.OrganizationId
+            })
+            .IsUnique();
+        
+        builder.HasOne(x => x.User)
+            .WithMany(x => x.Memberships)
+            .HasForeignKey(x => x.UserId)
+            .OnDelete(DeleteBehavior.Restrict);
+        
+        builder.HasOne(x => x.Organization)
+            .WithMany(x => x.Memberships)
+            .HasForeignKey(x => x.OrganizationId)
+            .OnDelete(DeleteBehavior.Restrict);
     }
 }

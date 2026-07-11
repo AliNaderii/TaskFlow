@@ -8,22 +8,20 @@ namespace TaskFlow.Domain.Entities;
 public sealed class TaskItem : AuditableEntity
 {
     public Guid ProjectId { get; private set; }
-
     public Guid CreatorUserId { get; private set; }
-
     public Guid? AssigneeUserId { get; private set; }
-
-    public TaskItemTitle Title { get; private set; }
-
+    public TaskItemTitle Title { get; private set; } = null!;
     public TaskItemDescription? Description { get; private set; }
-
     public TaskItemStatus Status { get; private set; }
-
     public TaskItemPriority Priority { get; private set; }
-
     public DateTime? DueDate { get; private set; }
-
     public bool IsArchived { get; private set; }
+    public Project Project { get; private set; } = null!;
+    public User Creator { get; private set; } = null!;
+    public User? Assignee { get; private set; }
+
+    private readonly List<Comment> _comments = [];
+    public IReadOnlyCollection<Comment> Comments => _comments.AsReadOnly();
 
     private TaskItem() { }
 

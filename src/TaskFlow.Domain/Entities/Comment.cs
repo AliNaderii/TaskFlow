@@ -7,16 +7,14 @@ namespace TaskFlow.Domain.Entities;
 public sealed class Comment : AuditableEntity
 {
     public Guid TaskId { get; private set; }
-
     public Guid AuthorUserId { get; private set; }
-
-    public CommentContent Content { get; private set; }
-
+    public CommentContent Content { get; private set; } = null!;
     public bool IsEdited { get; private set; }
-
     public bool IsArchived { get; private set; }
+    public TaskItem Task { get; private set; } = null!;
+    public User Author { get; private set; } = null!;
 
-    private Comment() { }
+    private Comment() {}
 
     private Comment(
             Guid taskId,
