@@ -35,14 +35,17 @@ internal sealed class TaskItemConfiguration : IEntityTypeConfiguration<TaskItem>
                 description => description == null ? null : description.Value,
                 value => value == null
                     ? null
-                    : TaskItemDescription.Create(value).Value);
+                    : TaskItemDescription.Create(value).Value)
+            .HasMaxLength(TaskItemConstants.DescriptionMaxLength);
 
         builder.Property(x => x.Status)
             .HasConversion<string>()
+            .HasMaxLength(50)
             .IsRequired();
 
         builder.Property(x => x.Priority)
             .HasConversion<string>()
+            .HasMaxLength(50)
             .IsRequired();
 
         builder.Property(x => x.DueDate);

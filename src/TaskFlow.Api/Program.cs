@@ -1,3 +1,7 @@
+using TaskFlow.Application.DependencyInjection;
+using TaskFlow.Infrastructure.DependencyInjection;
+
+
 namespace TaskFlow.Api
 {
     public class Program
@@ -11,6 +15,9 @@ namespace TaskFlow.Api
             builder.Services.AddControllers();
             // Learn more about configuring OpenAPI at https://aka.ms/aspnet/openapi
             builder.Services.AddSwaggerGen();
+
+            builder.Services.AddInfrastructure(builder.Configuration);
+            builder.Services.AddApplication();
 
             var app = builder.Build();
 

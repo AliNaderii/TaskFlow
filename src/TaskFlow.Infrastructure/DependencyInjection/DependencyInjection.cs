@@ -5,6 +5,8 @@ using TaskFlow.Application.Abstractions.Persistence;
 using TaskFlow.Infrastructure.Persistence;
 using TaskFlow.Infrastructure.Persistence.Repositories;
 
+namespace TaskFlow.Infrastructure.DependencyInjection;
+
 public static class DependencyInjection
 {
     public static IServiceCollection AddInfrastructure(

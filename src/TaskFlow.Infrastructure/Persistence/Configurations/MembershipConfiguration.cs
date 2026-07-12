@@ -20,10 +20,12 @@ internal sealed class MembershipConfiguration : IEntityTypeConfiguration<Members
 
         builder.Property(x => x.Role)
             .HasConversion<string>()
+            .HasMaxLength(50)
             .IsRequired();
 
         builder.Property(x => x.Status)
             .HasConversion<string>()
+            .HasMaxLength(50)
             .IsRequired();
 
         builder.Property(x => x.CreatedAt)
