@@ -1,6 +1,7 @@
 using MediatR;
 using Microsoft.AspNetCore.Mvc;
 using TaskFlow.Api.Contracts.Organizations;
+using TaskFlow.Api.Extensions;
 using TaskFlow.Application.Organizations.Commands.CreateOrganization;
 
 namespace TaskFlow.Api.Controllers;
@@ -25,7 +26,7 @@ public class OrganizationsController : ControllerBase
 
         if (result.IsFailure)
         {
-            return BadRequest(result.Error);
+            return result.Error.ToProblemDetails();
         }
 
         var response = new CreateOrganizationResponse(result.Value);

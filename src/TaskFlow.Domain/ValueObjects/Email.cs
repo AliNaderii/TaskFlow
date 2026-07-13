@@ -17,7 +17,7 @@ public sealed record Email
     {
         if (string.IsNullOrWhiteSpace(value))
         {
-            return Result<Email>.Failure(EmailErrors.Empty);
+            return Result<Email>.Failure(EmailErrors.Required);
         }
 
         value = value.Trim().ToLowerInvariant();

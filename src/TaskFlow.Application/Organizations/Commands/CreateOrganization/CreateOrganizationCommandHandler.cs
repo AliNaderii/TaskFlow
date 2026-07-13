@@ -34,7 +34,7 @@ public sealed class CreateOrganizationCommandHandler
 
         if (await _repository.ExistsByNameAsync(organizationNameResult.Value))
         {
-            return Result<Guid>.Failure(OrganizationErrors.NameAlreadyExists);
+            return Result<Guid>.Failure(OrganizationErrors.AlreadyExists);
         }
 
         var createOrganizationResult =

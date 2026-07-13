@@ -1,16 +1,17 @@
 ﻿using TaskFlow.Domain.Common;
+using TaskFlow.Domain.Constants;
 
 namespace TaskFlow.Domain.Errors;
 
 public static class UserErrors
 {
-    public static readonly Error DisplayNameIsEmpty =
+    public static readonly Error DisplayNameRequired =
         new(
-            "user.name.empty",
+            "User.Name.Required",
             "Display name is required");
 
     public static readonly Error DispalyNameIsTooLong =
         new(
-            "user.name.too_long",
-            "Display name cannot exceed 50 characters");
+            "User.Name.TooLong",
+            $"Display name cannot exceed {DisplayNameConstants.MaxLength} characters");
 }

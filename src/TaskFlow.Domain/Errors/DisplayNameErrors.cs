@@ -4,18 +4,18 @@ namespace TaskFlow.Domain.Errors;
 
 public static class DisplayNameErrors
 {
-    public static readonly Error Empty =
+    public static readonly Error Required =
         new(
-            "display_name.empty",
+            "DisplayName.Required",
             "Display name is required.");
 
     public static readonly Error TooShort =
         new(
-            "dispaly_name.too_short",
+            "DisplayName.TooShort",
             "Display name should be at least 3 characters.");
 
     public static readonly Error TooLong =
         new(
-            "dispaly_name.too_long",
+            "DisplayName.TooLong",
             "Display name should not be more than 20 characters.");
 }

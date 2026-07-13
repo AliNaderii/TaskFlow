@@ -6,7 +6,7 @@ public static class OrganizationErrors
 {
     public static readonly Error NameRequired =
         new(
-            "Organization.Name.Empty",
+            "Organization.Name.Required",
             "Organization name is required.");
 
     public static readonly Error NameTooLong =
@@ -18,8 +18,8 @@ public static class OrganizationErrors
         new(
             "Organization.Name.TooShort", 
             "Organization name is too short.");
-    public static readonly Error NameAlreadyExists =
+    public static readonly Error AlreadyExists =
         new(
-            "Organization.Name.NameAlreadyExists", 
+            "Organization.Name.AlreadyExists", 
             "Organization name already exists.");
 }

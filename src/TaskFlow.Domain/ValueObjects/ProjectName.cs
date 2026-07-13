@@ -17,7 +17,7 @@ public sealed record ProjectName
     {
         if (string.IsNullOrWhiteSpace(value))
         {
-            return Result<ProjectName>.Failure(ProjectErrors.NameIsEmpty);
+            return Result<ProjectName>.Failure(ProjectErrors.NameRequired);
         }
 
         value = value.Trim();

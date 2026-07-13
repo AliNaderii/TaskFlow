@@ -5,33 +5,33 @@ namespace TaskFlow.Domain.Errors;
 
 public static class ProjectErrors
 {
-    public static readonly Error NameIsEmpty =
+    public static readonly Error NameRequired =
         new(
-            "project.name.empty",
+            "project.Name.Required",
             "Project name is required.");
 
     public static readonly Error NameTooShort =
         new(
-            "project.name.too_short",
+            "Project.Name.TooShort",
             $"Project name must be at least {ProjectConstants.NameMinLength} characters.");
 
     public static readonly Error NameTooLong =
         new(
-            "project.name.too_long",
+            "Project.Name.TooLong",
             $"Project name cannot exceed {ProjectConstants.NameMaxLength} characters.");
 
     public static readonly Error DescriptionTooLong =
         new(
-            "project.description.too_long",
+            "Project.Description.TooLong",
             $"Project description cannot exceed {ProjectConstants.DescriptionMaxLength} characters.");
 
     public static readonly Error AlreadyArchived =
         new(
-            "project.already_archived",
+            "Project.AlreadyArchived",
             "Project is already archived.");
 
     public static readonly Error AlreadyActive =
         new(
-            "project.already_active",
+            "Project.AlreadyActive",
             "Project is already active.");
 }

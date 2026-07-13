@@ -4,13 +4,13 @@ namespace TaskFlow.Domain.Errors;
 
 public static class EmailErrors
 {
-    public static readonly Error Empty =
+    public static readonly Error Required =
         new(
-            "email.empty",
+            "Email.Required",
             "Email is required.");
 
     public static readonly Error Invalid =
         new(
-            "email.invalid",
+            "Email.Invalid",
             "Email format is invalid.");
 }

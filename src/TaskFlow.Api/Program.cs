@@ -1,5 +1,6 @@
 using TaskFlow.Application.DependencyInjection;
 using TaskFlow.Infrastructure.DependencyInjection;
+using TaskFlow.Api.Extensions;
 
 
 namespace TaskFlow.Api
@@ -31,12 +32,9 @@ namespace TaskFlow.Api
                     options.RoutePrefix = "swagger";
                 });
             }
-
+            app.UseExceptionHandling();
             app.UseHttpsRedirection();
-
             app.UseAuthorization();
-
-
             app.MapControllers();
 
             app.Run();

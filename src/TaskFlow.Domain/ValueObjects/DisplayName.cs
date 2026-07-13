@@ -18,7 +18,7 @@ public sealed record DisplayName
         if (string.IsNullOrWhiteSpace(value))
         {
             return Result<DisplayName>.Failure(
-                DisplayNameErrors.Empty);
+                DisplayNameErrors.Required);
         }
 
         value = value.Trim();
