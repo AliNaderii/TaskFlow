@@ -2,8 +2,11 @@ using MediatR;
 using Microsoft.AspNetCore.Mvc;
 using TaskFlow.Api.Contracts.Organizations;
 using TaskFlow.Api.Extensions;
+using TaskFlow.Application.Organizations.Commands.ArchiveOrganization;
 using TaskFlow.Application.Organizations.Commands.CreateOrganization;
+using TaskFlow.Application.Organizations.Commands.UpdateOrganization;
 using TaskFlow.Application.Organizations.Queries.GetOrganizationById;
+using TaskFlow.Domain.Common;
 
 namespace TaskFlow.Api.Controllers;
 
@@ -46,6 +49,42 @@ public class OrganizationsController : ControllerBase
 
         var response = new CreateOrganizationResponse(result.Value);
 
-        return CreatedAtAction(nameof(Create), response);
+        return CreatedAtAction(nameof(Create), new {Id = result.Value}, response);
+    }
+
+    [HttpPut("{id:guid}")]
+    public async Task<IActionResult> Update(
+        Guid id,
+        UpdateOrganizationRequest request,
+        CancellationToken cancellationToken)
+    {
+        var command = new UpdateOrganizationCommand(
+            id,
+            request.Name);
+
+        var result = await _sender.Send(command, cancellationToken);
+
+        if (result.IsFailure)
+        {
+            return result.Error.ToProblemDetails();
+        }
+
+        return NoContent();
+    }
+
+    [HttpPatch("{id:guid}/archive")]
+    public async Task<IActionResult> Archive(
+        Guid id,
+        CancellationToken cancellationToken)
+    {
+        var command = new ArchiveOrganizationCommand(id);
+        var result = await _sender.Send(command, cancellationToken);
+
+        if (result.IsFailure)
+        {
+            return result.Error.ToProblemDetails();
+        }
+
+        return NoContent();
     }
 }

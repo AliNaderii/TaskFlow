@@ -1,4 +1,5 @@
 using TaskFlow.Domain.Entities;
+using TaskFlow.Domain.ValueObjects;
 
 namespace TaskFlow.Application.Abstractions.Persistence;
 
@@ -18,5 +19,10 @@ public interface IProjectRepository
 
     Task AddAsync(
         Project project,
+        CancellationToken cancellationToken = default);
+    
+    Task<bool> ExistsByNameAsync(
+        Guid organizationId,
+        ProjectName name,
         CancellationToken cancellationToken = default);
 }

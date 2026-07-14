@@ -1,6 +1,5 @@
 using TaskFlow.Application.Abstractions.Messaging;
 using TaskFlow.Application.Abstractions.Persistence;
-using TaskFlow.Application.Organizations.Commands.CreateOrganization;
 using TaskFlow.Domain.Common;
 using TaskFlow.Domain.Errors;
 using TaskFlow.Domain.ValueObjects;
@@ -32,13 +31,14 @@ public sealed class CreateOrganizationCommandHandler
             return Result<Guid>.Failure(organizationNameResult.Error);
         }
 
-        if (await _repository.ExistsByNameAsync(organizationNameResult.Value))
+        if (await _repository.ExistsByNameAsync(
+                organizationNameResult.Value,
+                cancellationToken))
         {
             return Result<Guid>.Failure(OrganizationErrors.AlreadyExists);
         }
 
-        var createOrganizationResult =
-            Organization.Create(organizationNameResult.Value);
+        var createOrganizationResult = Organization.Create(organizationNameResult.Value);
         
         if (createOrganizationResult.IsFailure)
         {
@@ -51,6 +51,6 @@ public sealed class CreateOrganizationCommandHandler
         
         await _unitOfWork.SaveChangesAsync(cancellationToken);
 
-    return Result<Guid>.Success(createOrganizationResult.Value.Id);
+        return Result<Guid>.Success(createOrganizationResult.Value.Id);
     }
 }

@@ -27,4 +27,27 @@ public class Organization : AuditableEntity
         var organization = new Organization(name);
         return Result<Organization>.Success(organization);
     }
+
+    public BaseResult UpdateName(OrganizationName name)
+    {
+        if (Name == name)
+        {
+            return BaseResult.Success();
+        }
+        
+        Name = name;
+        return BaseResult.Success();
+    }
+
+    public BaseResult Archive()
+    {
+        if (ArchivedAt is not null)
+        {
+            return BaseResult.Failure(OrganizationErrors.AlreadyArchived);
+        }
+
+        ArchivedAt = DateTime.UtcNow;
+
+        return BaseResult.Success();
+    }
 }

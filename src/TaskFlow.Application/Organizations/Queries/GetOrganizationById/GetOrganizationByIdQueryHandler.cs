@@ -19,19 +19,19 @@ public sealed class GetOrganizationByIdQueryHandler
         GetOrganizationByIdQuery request, 
         CancellationToken cancellationToken)
     {
-        var result = await _organizationRepository.GetByIdAsync(
+        var organization = await _organizationRepository.GetByIdAsync(
             request.Id, 
             cancellationToken);
 
-        if (result is null)
+        if (organization is null)
             return Result<OrganizationDto>.Failure(OrganizationErrors.NotFound);
         
         var dto = new OrganizationDto(
-            result.Id, 
-            result.Name.Value,
-            result.CreatedAt,
-            result.UpdatedAt,
-            result.ArchivedAt);
+            organization.Id, 
+            organization.Name.Value,
+            organization.CreatedAt,
+            organization.UpdatedAt,
+            organization.ArchivedAt);
 
         return Result<OrganizationDto>.Success(dto);
     }

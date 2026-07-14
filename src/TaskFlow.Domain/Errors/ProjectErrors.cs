@@ -34,4 +34,9 @@ public static class ProjectErrors
         new(
             "Project.AlreadyActive",
             "Project is already active.");
+    
+    public static readonly Error AlreadyExists =
+        new(
+            "Organization.AlreadyExists", 
+            "A project with the same name already exists in this organization.");
 }

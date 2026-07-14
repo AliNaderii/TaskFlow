@@ -26,4 +26,8 @@ public static class OrganizationErrors
         new(
             "Organization.Name.AlreadyExists", 
             "Organization name already exists.");
+    public static readonly Error AlreadyArchived =
+        new(
+            "Organization.AlreadyArchived",
+            "Organization is already archived.");
 }
