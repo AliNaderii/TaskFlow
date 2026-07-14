@@ -12,4 +12,8 @@ public interface IOrganizationRepository
     Task AddAsync(
         Organization organization,
         CancellationToken cancellationToken = default);
+    
+    Task<Organization?> GetByIdAsync(
+        Guid Id,
+        CancellationToken cancellationToken);
 }

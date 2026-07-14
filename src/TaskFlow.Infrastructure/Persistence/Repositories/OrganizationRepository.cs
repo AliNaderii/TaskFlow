@@ -31,4 +31,13 @@ public sealed class OrganizationRepository : IOrganizationRepository
             x => x.Name == name, 
             cancellationToken);
     }
+
+    public async Task<Organization?> GetByIdAsync(
+        Guid Id, 
+        CancellationToken cancellationToken)
+    {
+        return await _context.Organizations.FirstOrDefaultAsync(
+            x => x.Id == Id,
+            cancellationToken);
+    }
 }

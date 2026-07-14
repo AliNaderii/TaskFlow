@@ -4,6 +4,10 @@ namespace TaskFlow.Domain.Errors;
 
 public static class OrganizationErrors
 {
+    public static readonly Error NotFound =
+        new(
+            "Organization.NotFound",
+            "Organization does not exist.");
     public static readonly Error NameRequired =
         new(
             "Organization.Name.Required",
