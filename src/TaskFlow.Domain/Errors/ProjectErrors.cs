@@ -5,9 +5,14 @@ namespace TaskFlow.Domain.Errors;
 
 public static class ProjectErrors
 {
+    public static readonly Error NotFound =
+        new(
+            "Project.NotFound",
+            "Project does not exist.");
+
     public static readonly Error NameRequired =
         new(
-            "project.Name.Required",
+            "Project.Name.Required",
             "Project name is required.");
 
     public static readonly Error NameTooShort =
