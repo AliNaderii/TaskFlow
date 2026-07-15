@@ -55,11 +55,14 @@ internal sealed class ProjectRepository : IProjectRepository
     public async Task<bool> ExistsByNameAsync(
         Guid organizationId,
         ProjectName name,
+        Guid? excludedProjectId = null,
         CancellationToken cancellationToken = default)
     {
         var result = await _context.Projects.AnyAsync(
-            x => x.OrganizationId == organizationId 
-            && x.Name == name,
+            project => 
+                project.OrganizationId == organizationId 
+                && project.Name == name
+                && (!excludedProjectId.HasValue || project.Id != excludedProjectId),
             cancellationToken);
         
         return result;

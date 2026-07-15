@@ -54,7 +54,7 @@ public sealed class CreateProjectCommandHandler
         var exists = await _projectRepository.ExistsByNameAsync(
                 request.OrganizationId,
                 projectNameResult.Value,
-                cancellationToken);
+                cancellationToken: cancellationToken);
         
         if (exists)
         {

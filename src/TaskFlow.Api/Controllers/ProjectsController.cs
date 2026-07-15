@@ -1,6 +1,8 @@
 using MediatR;
 using Microsoft.AspNetCore.Mvc;
+using TaskFlow.Api.Contracts.Projects;
 using TaskFlow.Api.Extensions;
+using TaskFlow.Application.Projects.Commands.UpdateProject;
 using TaskFlow.Application.Projects.Queries.GetProjectById;
 
 namespace TaskFlow.Api.Controllers;
@@ -30,5 +32,28 @@ public class ProjectsController : ControllerBase
         }
 
         return Ok(result.Value);
+    }
+
+    [HttpPut("{id:guid}")]
+    public async Task<IActionResult> Update(
+        Guid id,
+        UpdateProjectRequest request,
+        CancellationToken cancellationToken)
+    {
+        var command = new UpdateProjectCommand(
+            id,
+            request.Name,
+            request.Description);
+
+        var result = await _sender.Send(
+            command,
+            cancellationToken);
+
+        if (result.IsFailure)
+        {
+            return result.Error.ToProblemDetails();
+        }
+
+        return NoContent();
     }
 }

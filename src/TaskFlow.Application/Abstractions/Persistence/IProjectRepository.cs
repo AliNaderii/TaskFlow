@@ -24,5 +24,6 @@ public interface IProjectRepository
     Task<bool> ExistsByNameAsync(
         Guid organizationId,
         ProjectName name,
+        Guid? excludedProjectId = null,
         CancellationToken cancellationToken = default);
 }
