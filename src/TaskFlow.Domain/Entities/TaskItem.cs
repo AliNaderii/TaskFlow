@@ -27,18 +27,18 @@ public sealed class TaskItem : AuditableEntity
 
     private TaskItem(
         Guid projectId,
-        Guid creatorUserId,
         TaskItemTitle title,
         TaskItemDescription? description,
         TaskItemPriority priority,
-        DateTime? dueDate)
+        DateTime? dueDate,
+        Guid? assigneeUserId)
     {
         ProjectId = projectId;
-        CreatorUserId = creatorUserId;
         Title = title;
         Description = description;
         Priority = priority;
         DueDate = dueDate;
+        AssigneeUserId = assigneeUserId;
 
         Status = TaskItemStatus.Todo;
         IsArchived = false;
@@ -46,21 +46,21 @@ public sealed class TaskItem : AuditableEntity
 
     public static Result<TaskItem> Create(
         Guid projectId,
-        Guid creatorUserId,
         TaskItemTitle title,
         TaskItemDescription? description,
         TaskItemPriority priority,
-        DateTime? dueDate)
+        DateTime? dueDate,
+        Guid? assigneeUserId)
     {
-        var task = new TaskItem(
+        var taskItem = new TaskItem(
             projectId,
-            creatorUserId,
             title,
             description,
             priority,
-            dueDate);
+            dueDate,
+            assigneeUserId);
 
-        return Result<TaskItem>.Success(task);
+        return Result<TaskItem>.Success(taskItem);
     }
 
     public BaseResult Rename(TaskItemTitle title)
