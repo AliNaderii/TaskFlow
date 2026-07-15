@@ -2,6 +2,7 @@ using MediatR;
 using Microsoft.AspNetCore.Mvc;
 using TaskFlow.Api.Contracts.Projects;
 using TaskFlow.Api.Extensions;
+using TaskFlow.Application.Projects.Commands.ArchiveProject;
 using TaskFlow.Application.Projects.Commands.UpdateProject;
 using TaskFlow.Application.Projects.Queries.GetProjectById;
 
@@ -44,6 +45,25 @@ public class ProjectsController : ControllerBase
             id,
             request.Name,
             request.Description);
+
+        var result = await _sender.Send(
+            command,
+            cancellationToken);
+
+        if (result.IsFailure)
+        {
+            return result.Error.ToProblemDetails();
+        }
+
+        return NoContent();
+    }
+
+    [HttpPatch("{id:guid}/archive")]
+    public async Task<IActionResult> Archive(
+        Guid id,
+        CancellationToken cancellationToken)
+    {
+        var command = new ArchiveProjectCommand(id);
 
         var result = await _sender.Send(
             command,
