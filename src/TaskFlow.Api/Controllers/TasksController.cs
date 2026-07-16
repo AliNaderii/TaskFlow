@@ -1,7 +1,9 @@
 using MediatR;
 using Microsoft.AspNetCore.Mvc;
+using TaskFlow.Api.Extensions;
 using TaskFlow.Api.Tasks.Contracts;
 using TaskFlow.Application.Tasks.Commands.CreateTaskItem;
+using TaskFlow.Application.Tasks.Queries.GetTaskItemById;
 
 namespace TaskFlow.Api.Controllers;
 
@@ -40,5 +42,22 @@ public class TasksController : ControllerBase
             nameof(Create),
             new { id = result.Value },
             result.Value);
+    }
+
+    [HttpGet("{id:guid}")]
+    public async Task<IActionResult> GetById(
+        Guid id,
+        CancellationToken cancellationToken)
+    {
+        var query = new GetTaskItemByIdQuery(id);
+
+        var result = await _sender.Send(query, cancellationToken);
+
+        if (result.IsFailure)
+        {
+            return result.Error.ToProblemDetails();
+        }
+
+        return Ok(result.Value);
     }
 }

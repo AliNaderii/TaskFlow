@@ -4,6 +4,11 @@ namespace TaskFlow.Domain.Errors;
 
 public static class TaskItemErrors
 {
+    public static readonly Error NotFound =
+        new(
+            "Project.NotFound",
+            "Project does not exist.");
+
     public static readonly Error TitleRequired =
         new(
             "Task.Title.Required", 
