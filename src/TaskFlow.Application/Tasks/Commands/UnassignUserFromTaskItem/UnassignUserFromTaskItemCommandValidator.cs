@@ -2,10 +2,10 @@ using FluentValidation;
 
 namespace TaskFlow.Application.Tasks.Commands.UnassignUserFromTaskItem;
 
-public sealed class UnassignUserFromTaskCommandValidator
+public sealed class UnassignUserFromTaskItemCommandValidator
     : AbstractValidator<UnassignUserFromTaskItemCommand>
 {
-    public UnassignUserFromTaskCommandValidator()
+    public UnassignUserFromTaskItemCommandValidator()
     {
         RuleFor(x => x.TaskItemId)
             .NotEmpty();

@@ -5,6 +5,7 @@ using TaskFlow.Api.Extensions;
 using TaskFlow.Api.Tasks.Contracts;
 using TaskFlow.Application.Tasks.Commands.ArchiveTaskItem;
 using TaskFlow.Application.Tasks.Commands.AssignUserToTaskItem;
+using TaskFlow.Application.Tasks.Commands.ChangeTaskItemStatus;
 using TaskFlow.Application.Tasks.Commands.CreateTaskItem;
 using TaskFlow.Application.Tasks.Commands.UnassignUserFromTaskItem;
 using TaskFlow.Application.Tasks.Commands.UpdateTaskItem;
@@ -137,6 +138,28 @@ public class TasksController : ControllerBase
         var command = new UnassignUserFromTaskItemCommand(id);
 
         var result = await _sender.Send(command, cancellationToken);
+
+        if (result.IsFailure)
+        {
+            return result.Error.ToProblemDetails();
+        }
+
+        return NoContent();
+    }
+
+    [HttpPatch("{id:guid}/status")]
+    public async Task<IActionResult> ChangeStatus(
+        Guid id,
+        ChangeTaskItemStatusRequest request,
+        CancellationToken cancellationToken)
+    {
+        var command = new ChangeTaskItemStatusCommand(
+            id,
+            request.Status);
+
+        var result = await _sender.Send(
+            command,
+            cancellationToken);
 
         if (result.IsFailure)
         {

@@ -113,42 +113,53 @@ public sealed class TaskItem : AuditableEntity
     }
 
     public BaseResult AssignTo(Guid userId)
-{
-    if (IsArchived)
     {
-        return BaseResult.Failure(TaskItemErrors.AlreadyArchived);
+        if (IsArchived)
+        {
+            return BaseResult.Failure(TaskItemErrors.AlreadyArchived);
+        }
+    
+        if (AssigneeUserId == userId)
+        {
+            return BaseResult.Failure(TaskItemErrors.AlreadyAssignedToUser);
+        }
+    
+        AssigneeUserId = userId;
+    
+        return BaseResult.Success();
     }
-
-    if (AssigneeUserId == userId)
+    
+        public BaseResult Unassign()
     {
-        return BaseResult.Failure(TaskItemErrors.AlreadyAssignedToUser);
+        if (IsArchived)
+        {
+            return BaseResult.Failure(TaskItemErrors.AlreadyArchived);
+        }
+    
+        if (AssigneeUserId is null)
+        {
+            return BaseResult.Failure(TaskItemErrors.NotAssigned);
+        }
+    
+        AssigneeUserId = null;
+    
+        return BaseResult.Success();
     }
-
-    AssigneeUserId = userId;
-
-    return BaseResult.Success();
-}
-
-    public BaseResult Unassign()
-{
-    if (IsArchived)
+    
+        public BaseResult ChangeStatus(TaskItemStatus status)
     {
-        return BaseResult.Failure(TaskItemErrors.AlreadyArchived);
-    }
-
-    if (AssigneeUserId is null)
-    {
-        return BaseResult.Failure(TaskItemErrors.NotAssigned);
-    }
-
-    AssigneeUserId = null;
-
-    return BaseResult.Success();
-}
-
-    public BaseResult ChangeStatus(TaskItemStatus status)
-    {
+        if (IsArchived)
+        {
+            return BaseResult.Failure(TaskItemErrors.AlreadyArchived);
+        }
+    
+        if (Status == status)
+        {
+            return BaseResult.Failure(TaskItemErrors.StatusAlreadySet);
+        }
+    
         Status = status;
+    
         return BaseResult.Success();
     }
 
