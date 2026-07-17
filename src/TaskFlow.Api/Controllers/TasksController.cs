@@ -4,6 +4,7 @@ using TaskFlow.Api.Contracts.Tasks;
 using TaskFlow.Api.Extensions;
 using TaskFlow.Api.Tasks.Contracts;
 using TaskFlow.Application.Tasks.Commands.ArchiveTaskItem;
+using TaskFlow.Application.Tasks.Commands.AssignUserToTaskItem;
 using TaskFlow.Application.Tasks.Commands.CreateTaskItem;
 using TaskFlow.Application.Tasks.Commands.UpdateTaskItem;
 using TaskFlow.Application.Tasks.Queries.GetTaskItemById;
@@ -97,6 +98,28 @@ public class TasksController : ControllerBase
 
         var result = await _sender.Send(command, cancellationToken);
 
+        if (result.IsFailure)
+        {
+            return result.Error.ToProblemDetails();
+        }
+
+        return NoContent();
+    }
+
+    [HttpPatch("{id:guid}/assign")]
+    public async Task<IActionResult> AssignUser(
+        Guid id,
+        AssignUserToTaskRequest request,
+        CancellationToken cancellationToken)
+    {
+        var command = new AssignUserToTaskItemCommand(
+            id,
+            request.AssigneeUserId);
+
+        var result = await _sender.Send(
+            command,
+            cancellationToken);
+        
         if (result.IsFailure)
         {
             return result.Error.ToProblemDetails();

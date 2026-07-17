@@ -113,10 +113,21 @@ public sealed class TaskItem : AuditableEntity
     }
 
     public BaseResult AssignTo(Guid userId)
+{
+    if (IsArchived)
     {
-        AssigneeUserId = userId;
-        return BaseResult.Success();
+        return BaseResult.Failure(TaskItemErrors.AlreadyArchived);
     }
+
+    if (AssigneeUserId == userId)
+    {
+        return BaseResult.Failure(TaskItemErrors.AlreadyAssignedToUser);
+    }
+
+    AssigneeUserId = userId;
+
+    return BaseResult.Success();
+}
 
     public BaseResult Unassign()
     {

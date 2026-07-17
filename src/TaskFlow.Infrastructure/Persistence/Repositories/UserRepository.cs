@@ -40,4 +40,14 @@ public sealed class UserRepository : IUserRepository
             user => user.Email == email,
             cancellationToken);
     }
+
+    public async Task<User?> GetByIdAsync(
+        Guid id,
+        CancellationToken cancellationToken)
+    {
+        return await _context.Users
+            .FirstOrDefaultAsync(
+                x => x.Id == id,
+                cancellationToken);
+    }
 }

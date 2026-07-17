@@ -43,4 +43,9 @@ public static class TaskItemErrors
         new(
             "Task.CreatorUserId",
             "The user id provided for task is invalid");
+    
+    public static readonly Error AlreadyAssignedToUser =
+        new(
+        "TaskItem.AlreadyAssignedToUser",
+        "The task is already assigned to the specified user.");
 }
