@@ -130,10 +130,21 @@ public sealed class TaskItem : AuditableEntity
 }
 
     public BaseResult Unassign()
+{
+    if (IsArchived)
     {
-        AssigneeUserId = null;
-        return BaseResult.Success();
+        return BaseResult.Failure(TaskItemErrors.AlreadyArchived);
     }
+
+    if (AssigneeUserId is null)
+    {
+        return BaseResult.Failure(TaskItemErrors.NotAssigned);
+    }
+
+    AssigneeUserId = null;
+
+    return BaseResult.Success();
+}
 
     public BaseResult ChangeStatus(TaskItemStatus status)
     {

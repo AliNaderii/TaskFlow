@@ -48,4 +48,9 @@ public static class TaskItemErrors
         new(
         "TaskItem.AlreadyAssignedToUser",
         "The task is already assigned to the specified user.");
+    
+    public static readonly Error NotAssigned =
+        new(
+        "TaskItem.NotAssigned",
+        "The task is not assigned to any user.");
 }

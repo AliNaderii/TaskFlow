@@ -6,6 +6,7 @@ using TaskFlow.Api.Tasks.Contracts;
 using TaskFlow.Application.Tasks.Commands.ArchiveTaskItem;
 using TaskFlow.Application.Tasks.Commands.AssignUserToTaskItem;
 using TaskFlow.Application.Tasks.Commands.CreateTaskItem;
+using TaskFlow.Application.Tasks.Commands.UnassignUserFromTaskItem;
 using TaskFlow.Application.Tasks.Commands.UpdateTaskItem;
 using TaskFlow.Application.Tasks.Queries.GetTaskItemById;
 
@@ -120,6 +121,23 @@ public class TasksController : ControllerBase
             command,
             cancellationToken);
         
+        if (result.IsFailure)
+        {
+            return result.Error.ToProblemDetails();
+        }
+
+        return NoContent();
+    }
+
+    [HttpPatch("{id:guid}/unassign")]
+    public async Task<IActionResult> UnassignUser(
+        Guid id,
+        CancellationToken cancellationToken)
+    {
+        var command = new UnassignUserFromTaskItemCommand(id);
+
+        var result = await _sender.Send(command, cancellationToken);
+
         if (result.IsFailure)
         {
             return result.Error.ToProblemDetails();
