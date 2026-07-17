@@ -4,6 +4,6 @@ namespace TaskFlow.Api.Contracts.Tasks;
 
 public sealed record UpdateTaskItemRequest(
     string Title,
-    string Description,
+    string? Description,
     TaskItemPriority Priority,
     DateTime? DueDate);

@@ -3,6 +3,7 @@ using Microsoft.AspNetCore.Mvc;
 using TaskFlow.Api.Contracts.Tasks;
 using TaskFlow.Api.Extensions;
 using TaskFlow.Api.Tasks.Contracts;
+using TaskFlow.Application.Tasks.Commands.ArchiveTaskItem;
 using TaskFlow.Application.Tasks.Commands.CreateTaskItem;
 using TaskFlow.Application.Tasks.Commands.UpdateTaskItem;
 using TaskFlow.Application.Tasks.Queries.GetTaskItemById;
@@ -76,6 +77,23 @@ public class TasksController : ControllerBase
             request.Description,
             request.Priority,
             request.DueDate);
+
+        var result = await _sender.Send(command, cancellationToken);
+
+        if (result.IsFailure)
+        {
+            return result.Error.ToProblemDetails();
+        }
+
+        return NoContent();
+    }
+
+    [HttpPatch("{id:guid}/archive")]
+    public async Task<IActionResult> Archive(
+        Guid id,
+        CancellationToken cancellationToken)
+    {
+        var command = new ArchiveTaskItemCommand(id);
 
         var result = await _sender.Send(command, cancellationToken);
 
