@@ -53,6 +53,7 @@ public sealed class CreateTaskItemCommandHandler
 
         var taskResult = TaskItem.Create(
             request.ProjectId,
+            request.CreatorUserId,
             titleResult.Value,
             descriptionResult.Value,
             request.Priority,

@@ -27,6 +27,7 @@ public sealed class TaskItem : AuditableEntity
 
     private TaskItem(
         Guid projectId,
+        Guid creatorUserId,
         TaskItemTitle title,
         TaskItemDescription? description,
         TaskItemPriority priority,
@@ -34,6 +35,7 @@ public sealed class TaskItem : AuditableEntity
         Guid? assigneeUserId)
     {
         ProjectId = projectId;
+        CreatorUserId = creatorUserId;
         Title = title;
         Description = description;
         Priority = priority;
@@ -46,14 +48,21 @@ public sealed class TaskItem : AuditableEntity
 
     public static Result<TaskItem> Create(
         Guid projectId,
+        Guid creatorUserId,
         TaskItemTitle title,
         TaskItemDescription? description,
         TaskItemPriority priority,
         DateTime? dueDate,
         Guid? assigneeUserId)
     {
+        if (creatorUserId == Guid.Empty)
+        {
+            return Result<TaskItem>.Failure(TaskItemErrors.InvalidCreatorUserId);
+        }
+
         var taskItem = new TaskItem(
             projectId,
+            creatorUserId,
             title,
             description,
             priority,
@@ -63,15 +72,31 @@ public sealed class TaskItem : AuditableEntity
         return Result<TaskItem>.Success(taskItem);
     }
 
-    public BaseResult Rename(TaskItemTitle title)
+    public BaseResult Rename(string title)
     {
-        Title = title;
+        var result = TaskItemTitle.Create(title);
+
+        if (result.IsFailure)
+        {
+            return BaseResult.Failure(result.Error);
+        }
+
+        Title = result.Value;
+
         return BaseResult.Success();
     }
 
-    public BaseResult ChangeDescription(TaskItemDescription? description)
+    public BaseResult ChangeDescription(string? description)
     {
-        Description = description;
+        var result = TaskItemDescription.Create(description);
+
+        if (result.IsFailure)
+        {
+            return BaseResult.Failure(result.Error);
+        }
+
+        Description = result.Value;
+        
         return BaseResult.Success();
     }
 

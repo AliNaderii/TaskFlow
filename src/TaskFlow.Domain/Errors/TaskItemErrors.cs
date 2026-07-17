@@ -38,4 +38,9 @@ public static class TaskItemErrors
         new(
             "Task.NotArchived", 
             "Task is not archived.");
+    
+    public static readonly Error InvalidCreatorUserId =
+        new(
+            "Task.CreatorUserId",
+            "The user id provided for task is invalid");
 }

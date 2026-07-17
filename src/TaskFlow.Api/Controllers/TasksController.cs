@@ -1,8 +1,10 @@
 using MediatR;
 using Microsoft.AspNetCore.Mvc;
+using TaskFlow.Api.Contracts.Tasks;
 using TaskFlow.Api.Extensions;
 using TaskFlow.Api.Tasks.Contracts;
 using TaskFlow.Application.Tasks.Commands.CreateTaskItem;
+using TaskFlow.Application.Tasks.Commands.UpdateTaskItem;
 using TaskFlow.Application.Tasks.Queries.GetTaskItemById;
 
 namespace TaskFlow.Api.Controllers;
@@ -25,6 +27,7 @@ public class TasksController : ControllerBase
     {
         var command = new CreateTaskItemCommand(
             request.ProjectId,
+            request.CreatorUserId,
             request.Title,
             request.Description,
             request.Priority,
@@ -59,5 +62,28 @@ public class TasksController : ControllerBase
         }
 
         return Ok(result.Value);
+    }
+
+    [HttpPut("{id:guid}")]
+    public async Task<IActionResult> Update(
+        Guid id,
+        UpdateTaskItemRequest request,
+        CancellationToken cancellationToken)
+    {
+        var command = new UpdateTaskItemCommand(
+            id,
+            request.Title,
+            request.Description,
+            request.Priority,
+            request.DueDate);
+
+        var result = await _sender.Send(command, cancellationToken);
+
+        if (result.IsFailure)
+        {
+            return result.Error.ToProblemDetails();
+        }
+
+        return NoContent();
     }
 }
