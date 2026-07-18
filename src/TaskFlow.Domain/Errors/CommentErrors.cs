@@ -4,6 +4,10 @@ namespace TaskFlow.Domain.Errors;
 
 public static class CommentErrors
 {
+    public static readonly Error NotFound =
+        new(
+            "Comment.NotFound",
+            "Comment does not exist.");
     public static readonly Error ContentRequired =
         new(
             "Comment.Content.Required",

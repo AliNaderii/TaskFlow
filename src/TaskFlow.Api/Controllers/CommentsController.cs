@@ -3,6 +3,7 @@ using Microsoft.AspNetCore.Mvc;
 using TaskFlow.Api.Contracts.Comments;
 using TaskFlow.Api.Extensions;
 using TaskFlow.Application.Comments.Commands.CreateComment;
+using TaskFlow.Application.Comments.Queries.GetCommentById;
 
 namespace TaskFlow.Api.Controllers;
 
@@ -41,5 +42,25 @@ public sealed class CommentsController : ControllerBase
             nameof(Create),
             new { id = result.Value },
             result.Value);
+    }
+
+    [HttpGet("{commentId:guid}")]
+    public async Task<IActionResult> GetById(
+        Guid taskId,
+        Guid commentId,
+        CancellationToken cancellationToken)
+    {
+        var query = new GetCommentByIdQuery(commentId);
+
+        var result = await _sender.Send(
+            query,
+            cancellationToken);
+
+        if (result.IsFailure)
+        {
+            return result.Error.ToProblemDetails();
+        }
+
+        return Ok(result.Value);
     }
 }
