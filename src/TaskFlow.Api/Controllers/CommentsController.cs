@@ -3,6 +3,7 @@ using Microsoft.AspNetCore.Mvc;
 using TaskFlow.Api.Contracts.Comments;
 using TaskFlow.Api.Extensions;
 using TaskFlow.Application.Comments.Commands.CreateComment;
+using TaskFlow.Application.Comments.Commands.UpdateComment;
 using TaskFlow.Application.Comments.Queries.GetCommentById;
 
 namespace TaskFlow.Api.Controllers;
@@ -62,5 +63,23 @@ public sealed class CommentsController : ControllerBase
         }
 
         return Ok(result.Value);
+    }
+
+    [HttpPut("{commentId:guid}")]
+    public async Task<IActionResult> Update(
+        Guid taskId,
+        Guid commentId,
+        UpdateCommentRequest request,
+        CancellationToken cancellationToken)
+    {
+        var command = new UpdateCommentCommand(commentId, request.Content);
+        var result = await _sender.Send(command, cancellationToken);
+
+        if (result.IsFailure)
+        {
+            return result.Error.ToProblemDetails();
+        }
+
+        return NoContent();
     }
 }

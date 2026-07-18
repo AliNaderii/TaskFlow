@@ -41,9 +41,16 @@ public sealed class Comment : AuditableEntity
         return Result<Comment>.Success(comment);
     }
 
-    public BaseResult Edit(CommentContent content)
+    public BaseResult UpdateContent(string content)
     {
-        Content = content;
+        var result = CommentContent.Create(content);
+
+        if (result.IsFailure)
+        {
+            return BaseResult.Failure(result.Error);
+        }
+        
+        Content = result.Value;
         IsEdited = true;
 
         return BaseResult.Success();
