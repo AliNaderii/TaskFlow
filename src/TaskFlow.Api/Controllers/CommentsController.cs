@@ -2,6 +2,7 @@ using MediatR;
 using Microsoft.AspNetCore.Mvc;
 using TaskFlow.Api.Contracts.Comments;
 using TaskFlow.Api.Extensions;
+using TaskFlow.Application.Comments.Commands.ArchiveComment;
 using TaskFlow.Application.Comments.Commands.CreateComment;
 using TaskFlow.Application.Comments.Commands.UpdateComment;
 using TaskFlow.Application.Comments.Queries.GetCommentById;
@@ -73,6 +74,24 @@ public sealed class CommentsController : ControllerBase
         CancellationToken cancellationToken)
     {
         var command = new UpdateCommentCommand(commentId, request.Content);
+        var result = await _sender.Send(command, cancellationToken);
+
+        if (result.IsFailure)
+        {
+            return result.Error.ToProblemDetails();
+        }
+
+        return NoContent();
+    }
+
+    [HttpDelete("{commentId:guid}")]
+    public async Task<IActionResult> Archive(
+        Guid taskId,
+        Guid commentId,
+        CancellationToken cancellationToken)
+    {
+        var command = new ArchiveCommentCommand(commentId);
+
         var result = await _sender.Send(command, cancellationToken);
 
         if (result.IsFailure)
