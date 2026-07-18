@@ -1,0 +1,45 @@
+using MediatR;
+using Microsoft.AspNetCore.Mvc;
+using TaskFlow.Api.Contracts.Comments;
+using TaskFlow.Api.Extensions;
+using TaskFlow.Application.Comments.Commands.CreateComment;
+
+namespace TaskFlow.Api.Controllers;
+
+[ApiController]
+[Route("api/tasks/{taskId:guid}/comments")]
+public sealed class CommentsController : ControllerBase
+{
+    private readonly ISender _sender;
+
+    public CommentsController(ISender sender)
+    {
+        _sender = sender;
+    }
+
+    [HttpPost]
+    public async Task<IActionResult> Create(
+        Guid taskId,
+        CreateCommentRequest request,
+        CancellationToken cancellationToken)
+    {
+        var command = new CreateCommentCommand(
+            taskId,
+            request.AuthorUserId,
+            request.Content);
+
+        var result = await _sender.Send(
+            command,
+            cancellationToken);
+
+        if (result.IsFailure)
+        {
+            return result.Error.ToProblemDetails();
+        }
+
+        return CreatedAtAction(
+            nameof(Create),
+            new { id = result.Value },
+            result.Value);
+    }
+}
