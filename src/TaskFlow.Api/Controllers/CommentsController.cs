@@ -6,6 +6,7 @@ using TaskFlow.Application.Comments.Commands.ArchiveComment;
 using TaskFlow.Application.Comments.Commands.CreateComment;
 using TaskFlow.Application.Comments.Commands.UpdateComment;
 using TaskFlow.Application.Comments.Queries.GetCommentById;
+using TaskFlow.Application.Comments.Queries.GetCommentsByTaskId;
 
 namespace TaskFlow.Api.Controllers;
 
@@ -53,6 +54,25 @@ public sealed class CommentsController : ControllerBase
         CancellationToken cancellationToken)
     {
         var query = new GetCommentByIdQuery(commentId);
+
+        var result = await _sender.Send(
+            query,
+            cancellationToken);
+
+        if (result.IsFailure)
+        {
+            return result.Error.ToProblemDetails();
+        }
+
+        return Ok(result.Value);
+    }
+
+    [HttpGet]
+    public async Task<IActionResult> GetByTaskId(
+        Guid taskId,
+        CancellationToken cancellationToken)
+    {
+        var query = new GetCommentsByTaskIdQuery(taskId);
 
         var result = await _sender.Send(
             query,
