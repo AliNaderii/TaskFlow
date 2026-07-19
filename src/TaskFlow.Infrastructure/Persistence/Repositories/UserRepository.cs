@@ -15,28 +15,28 @@ public sealed class UserRepository : IUserRepository
     }
 
     public async Task AddAsync(
-        User user, 
+        User user,
         CancellationToken cancellationToken = default)
     {
-        await _context.Users.AddAsync(
+        await _context.DomainUsers.AddAsync(
             user,
             cancellationToken);
     }
 
     public async Task<bool> ExistsByEmailAsync(
-        Email email, 
+        Email email,
         CancellationToken cancellationToken = default)
     {
-        return await _context.Users.AnyAsync(
+        return await _context.DomainUsers.AnyAsync(
             user => user.Email == email,
             cancellationToken);
     }
 
     public async Task<User?> GetByEmailAsync(
-        Email email, 
+        Email email,
         CancellationToken cancellationToken = default)
     {
-        return await _context.Users.FirstOrDefaultAsync(
+        return await _context.DomainUsers.FirstOrDefaultAsync(
             user => user.Email == email,
             cancellationToken);
     }
@@ -45,7 +45,7 @@ public sealed class UserRepository : IUserRepository
         Guid id,
         CancellationToken cancellationToken)
     {
-        return await _context.Users
+        return await _context.DomainUsers
             .FirstOrDefaultAsync(
                 x => x.Id == id,
                 cancellationToken);

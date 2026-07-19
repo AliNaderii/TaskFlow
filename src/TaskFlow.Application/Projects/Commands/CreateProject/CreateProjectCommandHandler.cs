@@ -28,10 +28,10 @@ public sealed class CreateProjectCommandHandler
         CreateProjectCommand request, 
         CancellationToken cancellationToken)
     {
-        var organization = _organizationRepository.GetByIdAsync(
+        var organization = await _organizationRepository.GetByIdAsync(
             request.OrganizationId,
             cancellationToken);
-        
+
         if (organization is null)
         {
             return Result<Guid>.Failure(OrganizationErrors.NotFound);
@@ -55,7 +55,7 @@ public sealed class CreateProjectCommandHandler
                 request.OrganizationId,
                 projectNameResult.Value,
                 cancellationToken: cancellationToken);
-        
+
         if (exists)
         {
             return Result<Guid>.Failure(ProjectErrors.AlreadyExists);
@@ -65,7 +65,7 @@ public sealed class CreateProjectCommandHandler
             request.OrganizationId,
             projectNameResult.Value,
             projectDescriptionResult.Value);
-        
+
         if (createProjectResult.IsFailure)
         {
             return Result<Guid>.Failure(createProjectResult.Error);
@@ -74,11 +74,7 @@ public sealed class CreateProjectCommandHandler
         await _projectRepository.AddAsync(
             createProjectResult.Value,
             cancellationToken);
-        
-        await _projectRepository.AddAsync(
-            createProjectResult.Value,
-            cancellationToken);
-        
+
         await _unitOfWork.SaveChangesAsync(cancellationToken);
 
         return Result<Guid>.Success(createProjectResult.Value.Id);
