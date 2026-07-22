@@ -17,4 +17,8 @@ public interface IMembershipRepository
     Task AddAsync(
         Membership membership,
         CancellationToken cancellationToken = default);
+    
+    Task<Guid?> GetOrganizationIdForUserAsync(
+        Guid userId,
+        CancellationToken cancellationToken = default);
 }

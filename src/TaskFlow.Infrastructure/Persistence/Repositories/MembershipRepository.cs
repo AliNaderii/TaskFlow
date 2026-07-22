@@ -42,4 +42,14 @@ public sealed class MembershipRepository : IMembershipRepository
             && x.OrganizationId == organizationId,
             cancellationToken);
     }
+
+    public async Task<Guid?> GetOrganizationIdForUserAsync(
+        Guid userId,
+        CancellationToken cancellationToken = default)
+    {
+        return await _context.Memberships
+            .Where(x => x.UserId == userId)
+            .Select(x => (Guid?)x.OrganizationId)
+            .FirstOrDefaultAsync(cancellationToken);
+    }
 }

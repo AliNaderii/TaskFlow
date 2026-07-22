@@ -12,6 +12,8 @@ using TaskFlow.Infrastructure.Identity;
 using TaskFlow.Infrastructure.Persistence;
 using TaskFlow.Infrastructure.Authentication;
 using TaskFlow.Infrastructure.Persistence.Repositories;
+using TaskFlow.Application.Abstractions.MultiTenancy;
+using TaskFlow.Infrastructure.MultiTenancy;
 
 namespace TaskFlow.Infrastructure.DependencyInjection;
 
@@ -89,6 +91,11 @@ public static class DependencyInjection
         services.AddScoped<IIdentityService, IdentityService>();
         services.AddScoped<IRefreshTokenService, RefreshTokenService>();
         services.AddScoped<ICurrentUser, CurrentUser>();
+        services.AddScoped<ITenantResolver, TenantResolver>();
+        services.AddScoped<ITenantContextInitializer, TenantContextInitializer>();
+        services.AddScoped<CurrentTenant>();
+        services.AddScoped<ICurrentTenant>(
+            provider => provider.GetRequiredService<CurrentTenant>());
 
         return services;
     }

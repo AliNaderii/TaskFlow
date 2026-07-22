@@ -1,6 +1,7 @@
 using TaskFlow.Application.DependencyInjection;
 using TaskFlow.Infrastructure.DependencyInjection;
 using TaskFlow.Api.Extensions;
+using TaskFlow.Infrastructure.MultiTenancy;
 
 
 namespace TaskFlow.Api
@@ -11,10 +12,7 @@ namespace TaskFlow.Api
         {
             var builder = WebApplication.CreateBuilder(args);
 
-            // Add services to the container.
-
             builder.Services.AddControllers();
-            // Learn more about configuring OpenAPI at https://aka.ms/aspnet/openapi
             builder.Services.AddSwaggerGen();
 
             builder.Services.AddInfrastructure(builder.Configuration);
@@ -22,7 +20,6 @@ namespace TaskFlow.Api
 
             var app = builder.Build();
 
-            // Configure the HTTP request pipeline.
             if (app.Environment.IsDevelopment())
             {
                 app.UseSwagger();
@@ -32,9 +29,11 @@ namespace TaskFlow.Api
                     options.RoutePrefix = "swagger";
                 });
             }
+            
             app.UseExceptionHandling();
             app.UseHttpsRedirection();
             app.UseAuthentication();
+            app.UseTenant();
             app.UseAuthorization();
             app.MapControllers();
 
