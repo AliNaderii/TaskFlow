@@ -34,6 +34,7 @@ namespace TaskFlow.Api
             }
             app.UseExceptionHandling();
             app.UseHttpsRedirection();
+            app.UseAuthentication();
             app.UseAuthorization();
             app.MapControllers();
 
