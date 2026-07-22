@@ -4,6 +4,8 @@ using TaskFlow.Api.Extensions;
 using TaskFlow.Api.Contracts.Authentication;
 using TaskFlow.Application.Authentication.Login;
 using TaskFlow.Application.Authentication.Register;
+using TaskFlow.Api.Authentication;
+using TaskFlow.Application.Authentication.RefreshToken;
 
 namespace TaskFlow.Api.Controllers;
 
@@ -56,6 +58,26 @@ public class AuthenticationController : ControllerBase
         var result = await _sender.Send(command, cancellationToken);
 
         if (result.IsFailure)
+        {
+            return result.Error.ToProblemDetails();
+        }
+
+        return Ok(result.Value);
+    }
+
+    [HttpPost("refresh-token")]
+    public async Task<IActionResult> RefreshToken(
+        RefreshTokenRequest request,
+        CancellationToken cancellationToken)
+    {
+        var command = new RefreshTokenCommand(request.RefreshToken);
+
+        var result =
+            await _sender.Send(
+                command,
+                cancellationToken);
+
+        if (!result.IsSuccess)
         {
             return result.Error.ToProblemDetails();
         }

@@ -4,6 +4,7 @@ using Microsoft.AspNetCore.Identity.EntityFrameworkCore;
 using Microsoft.EntityFrameworkCore;
 using TaskFlow.Application.Abstractions.Persistence;
 using TaskFlow.Domain.Entities;
+using TaskFlow.Infrastructure.Authentication;
 namespace TaskFlow.Infrastructure.Persistence;
 
 public class ApplicationDbContext
@@ -29,4 +30,5 @@ public class ApplicationDbContext
     public DbSet<Organization> Organizations => Set<Organization>();
     public DbSet<Comment> Comments => Set<Comment>();
     public DbSet<Membership> Memberships => Set<Membership>();
+    public DbSet<RefreshToken> RefreshTokens => Set<RefreshToken>();
 }

@@ -34,12 +34,14 @@ public sealed class LoginCommandHandler
             return Result<LoginResponse>.Failure(AuthenticationErrors.InvalidCredentials);
         }
 
-
         var token = _jwtTokenProvider.GenerateToken(
             userId.Value, 
             request.Email);
 
         return Result<LoginResponse>.Success(
-            new LoginResponse(userId.Value, token));
+            new LoginResponse(
+                userId.Value, 
+                token,
+                null));
     }
 }
