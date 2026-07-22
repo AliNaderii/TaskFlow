@@ -1,4 +1,5 @@
 using MediatR;
+using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;
 using TaskFlow.Api.Contracts.Projects;
 using TaskFlow.Api.Extensions;
@@ -8,6 +9,7 @@ using TaskFlow.Application.Projects.Queries.GetProjectById;
 
 namespace TaskFlow.Api.Controllers;
 
+[Authorize]
 [ApiController]
 [Route("api/[controller]")]
 public class ProjectsController : ControllerBase

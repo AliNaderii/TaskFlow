@@ -1,4 +1,5 @@
 using MediatR;
+using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;
 using TaskFlow.Api.Contracts.Comments;
 using TaskFlow.Api.Extensions;
@@ -10,6 +11,7 @@ using TaskFlow.Application.Comments.Queries.GetCommentsByTaskId;
 
 namespace TaskFlow.Api.Controllers;
 
+[Authorize]
 [ApiController]
 [Route("api/tasks/{taskId:guid}/comments")]
 public sealed class CommentsController : ControllerBase

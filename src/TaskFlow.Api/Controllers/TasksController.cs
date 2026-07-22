@@ -1,4 +1,5 @@
 using MediatR;
+using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;
 using TaskFlow.Api.Contracts.Tasks;
 using TaskFlow.Api.Extensions;
@@ -13,6 +14,7 @@ using TaskFlow.Application.Tasks.Queries.GetTaskItemById;
 
 namespace TaskFlow.Api.Controllers;
 
+[Authorize]
 [ApiController]
 [Route("api/[controller]")]
 public class TasksController : ControllerBase

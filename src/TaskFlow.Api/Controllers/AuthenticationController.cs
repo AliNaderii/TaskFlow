@@ -6,6 +6,7 @@ using TaskFlow.Application.Authentication.Login;
 using TaskFlow.Application.Authentication.Register;
 using TaskFlow.Api.Authentication;
 using TaskFlow.Application.Authentication.RefreshToken;
+using Microsoft.AspNetCore.Authorization;
 
 namespace TaskFlow.Api.Controllers;
 
@@ -21,7 +22,7 @@ public class AuthenticationController : ControllerBase
         _sender = sender;
     }
 
-
+    [AllowAnonymous]
     [HttpPost("register")]
     public async Task<IActionResult> Register(
         ApiRegisterRequest request,
@@ -48,6 +49,7 @@ public class AuthenticationController : ControllerBase
         });
     }
 
+    [AllowAnonymous]
     [HttpPost("login")]
     public async Task<IActionResult> Login(
         ApiLoginRequest request,
@@ -65,6 +67,7 @@ public class AuthenticationController : ControllerBase
         return Ok(result.Value);
     }
 
+    [AllowAnonymous]
     [HttpPost("refresh-token")]
     public async Task<IActionResult> RefreshToken(
         RefreshTokenRequest request,

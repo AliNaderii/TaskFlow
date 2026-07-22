@@ -27,6 +27,8 @@ public static class DependencyInjection
                 options.UseSqlServer(
                     configuration.GetConnectionString("DefaultConnection"));
             });
+        
+        services.AddHttpContextAccessor();
 
         services.Configure<JwtOptions>(
             configuration.GetSection(JwtOptions.SectionName));
@@ -58,9 +60,8 @@ public static class DependencyInjection
                     ValidIssuer = jwtOptions.Issuer,
                     ValidAudience = jwtOptions.Audience,
 
-                    IssuerSigningKey =
-                        new SymmetricSecurityKey(
-                            Encoding.UTF8.GetBytes(jwtOptions.SecretKey))
+                    IssuerSigningKey = new SymmetricSecurityKey(
+                        Encoding.UTF8.GetBytes(jwtOptions.SecretKey))
                 };
             });
             
@@ -86,8 +87,8 @@ public static class DependencyInjection
             .AddDefaultTokenProviders();
 
         services.AddScoped<IIdentityService, IdentityService>();
-
         services.AddScoped<IRefreshTokenService, RefreshTokenService>();
+        services.AddScoped<ICurrentUser, CurrentUser>();
 
         return services;
     }
