@@ -32,4 +32,9 @@ public static class CommentErrors
         new(
             "Comment.NotArchived", 
             "Comment is not archived.");
+
+    public static readonly Error InvalidOrganizationId =
+        new(
+            "Comment.InvalidOrganizationId",
+            "OrganizationId is required.");
 }

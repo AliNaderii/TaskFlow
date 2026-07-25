@@ -1,4 +1,5 @@
 using TaskFlow.Application.Abstractions.Messaging;
+using TaskFlow.Application.Abstractions.MultiTenancy;
 using TaskFlow.Application.Abstractions.Persistence;
 using TaskFlow.Domain.Common;
 using TaskFlow.Domain.Entities;
@@ -13,15 +14,18 @@ public sealed class CreateCommentCommandHandler
     private readonly ITaskItemRepository _taskItemRepository;
     private readonly ICommentRepository _commentRepository;
     private readonly IUnitOfWork _unitOfWork;
+    private readonly ICurrentTenant _currentTenant;
 
     public CreateCommentCommandHandler(
         ITaskItemRepository taskItemRepository,
         ICommentRepository commentRepository,
-        IUnitOfWork unitOfWork)
+        IUnitOfWork unitOfWork,
+        ICurrentTenant currentTenant)
     {
         _taskItemRepository = taskItemRepository;
         _commentRepository = commentRepository;
         _unitOfWork = unitOfWork;
+        _currentTenant = currentTenant;
     }
 
     public async Task<Result<Guid>> Handle(
@@ -48,6 +52,7 @@ public sealed class CreateCommentCommandHandler
         }
 
         var commentResult = Comment.Create(
+            _currentTenant.OrganizationId.Value,
             request.TaskId,
             request.AuthorUserId,
             contentResult.Value);

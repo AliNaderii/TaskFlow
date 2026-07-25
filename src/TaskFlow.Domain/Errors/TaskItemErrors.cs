@@ -58,4 +58,9 @@ public static class TaskItemErrors
         new(
         "TaskItem.StatusAlreadySet",
         "The task already has the specified status.");
+
+    public static readonly Error InvalidOrganizationId =
+        new(
+        "TaskItem.InvalidOrganizationId",
+        "OrganizationId is required.");
 }

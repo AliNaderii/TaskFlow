@@ -5,8 +5,9 @@ using TaskFlow.Domain.Errors;
 
 namespace TaskFlow.Domain.Entities;
 
-public sealed class TaskItem : AuditableEntity
+public sealed class TaskItem : AuditableEntity, ITenantEntity
 {
+    public Guid OrganizationId {get; private set;}
     public Guid ProjectId { get; private set; }
     public Guid CreatorUserId { get; private set; }
     public Guid? AssigneeUserId { get; private set; }
@@ -23,9 +24,11 @@ public sealed class TaskItem : AuditableEntity
     private readonly List<Comment> _comments = [];
     public IReadOnlyCollection<Comment> Comments => _comments.AsReadOnly();
 
+
     private TaskItem() { }
 
     private TaskItem(
+        Guid organizationId,
         Guid projectId,
         Guid creatorUserId,
         TaskItemTitle title,
@@ -34,6 +37,7 @@ public sealed class TaskItem : AuditableEntity
         DateTime? dueDate,
         Guid? assigneeUserId)
     {
+        OrganizationId = organizationId;
         ProjectId = projectId;
         CreatorUserId = creatorUserId;
         Title = title;
@@ -47,6 +51,7 @@ public sealed class TaskItem : AuditableEntity
     }
 
     public static Result<TaskItem> Create(
+        Guid organizationId,
         Guid projectId,
         Guid creatorUserId,
         TaskItemTitle title,
@@ -60,7 +65,13 @@ public sealed class TaskItem : AuditableEntity
             return Result<TaskItem>.Failure(TaskItemErrors.InvalidCreatorUserId);
         }
 
+        if (organizationId == Guid.Empty)
+        {
+            return Result<TaskItem>.Failure(TaskItemErrors.InvalidOrganizationId);
+        }
+
         var taskItem = new TaskItem(
+            organizationId,
             projectId,
             creatorUserId,
             title,

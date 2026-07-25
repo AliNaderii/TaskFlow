@@ -4,7 +4,7 @@ using TaskFlow.Domain.Errors;
 
 namespace TaskFlow.Domain.Entities;
 
-public sealed class Project : AuditableEntity
+public sealed class Project : AuditableEntity, ITenantEntity
 {
     public Guid OrganizationId { get; private set; }
     public ProjectName Name { get; private set; } = null!;

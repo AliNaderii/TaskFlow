@@ -1,4 +1,5 @@
 using TaskFlow.Application.Abstractions.Messaging;
+using TaskFlow.Application.Abstractions.MultiTenancy;
 using TaskFlow.Application.Abstractions.Persistence;
 using TaskFlow.Domain.Common;
 using TaskFlow.Domain.Entities;
@@ -13,23 +14,33 @@ public sealed class CreateProjectCommandHandler
     private readonly IProjectRepository _projectRepository;
     private readonly IOrganizationRepository _organizationRepository;
     private readonly IUnitOfWork _unitOfWork;
+    private readonly ICurrentTenant _currentTenant;
 
     public CreateProjectCommandHandler(
         IProjectRepository projectRepository,
         IOrganizationRepository organizationRepository,
-        IUnitOfWork unitOfWork)
+        IUnitOfWork unitOfWork,
+        ICurrentTenant currentTenant)
     {
         _projectRepository = projectRepository;
         _organizationRepository = organizationRepository;
         _unitOfWork = unitOfWork;
+        _currentTenant = currentTenant;
     }
 
     public async Task<Result<Guid>> Handle(
         CreateProjectCommand request, 
         CancellationToken cancellationToken)
     {
+        if (!_currentTenant.OrganizationId.HasValue)
+        {
+            return Result<Guid>.Failure(TenantErrors.NotFound);
+        }
+
+        var organizationId = _currentTenant.OrganizationId.Value;
+
         var organization = await _organizationRepository.GetByIdAsync(
-            request.OrganizationId,
+            organizationId,
             cancellationToken);
 
         if (organization is null)
@@ -52,7 +63,7 @@ public sealed class CreateProjectCommandHandler
         }
 
         var exists = await _projectRepository.ExistsByNameAsync(
-                request.OrganizationId,
+                organizationId,
                 projectNameResult.Value,
                 cancellationToken: cancellationToken);
 
@@ -62,7 +73,7 @@ public sealed class CreateProjectCommandHandler
         }
 
         var createProjectResult = Project.Create(
-            request.OrganizationId,
+            organizationId,
             projectNameResult.Value,
             projectDescriptionResult.Value);
 

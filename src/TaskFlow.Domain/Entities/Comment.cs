@@ -4,8 +4,9 @@ using TaskFlow.Domain.ValueObjects;
 
 namespace TaskFlow.Domain.Entities;
 
-public sealed class Comment : AuditableEntity
+public sealed class Comment : AuditableEntity, ITenantEntity
 {
+    public Guid OrganizationId {get; private set;}
     public Guid TaskId { get; private set; }
     public Guid AuthorUserId { get; private set; }
     public CommentContent Content { get; private set; } = null!;
@@ -14,13 +15,16 @@ public sealed class Comment : AuditableEntity
     public TaskItem Task { get; private set; } = null!;
     public User Author { get; private set; } = null!;
 
+
     private Comment() {}
 
     private Comment(
+            Guid organizationId,
             Guid taskId,
             Guid authorUserId,
             CommentContent content)
     {
+        OrganizationId = organizationId;
         TaskId = taskId;
         AuthorUserId = authorUserId;
         Content = content;
@@ -29,11 +33,18 @@ public sealed class Comment : AuditableEntity
     }
 
     public static Result<Comment> Create(
+        Guid organizationId,
         Guid taskId,
         Guid authorUserId,
         CommentContent content)
     {
+        if (organizationId == Guid.Empty)
+        {
+            return Result<Comment>.Failure(CommentErrors.InvalidOrganizationId);
+        }
+
         var comment = new Comment(
+            organizationId,
             taskId,
             authorUserId,
             content);

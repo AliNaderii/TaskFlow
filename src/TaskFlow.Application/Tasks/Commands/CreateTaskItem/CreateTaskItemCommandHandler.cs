@@ -1,4 +1,5 @@
 using TaskFlow.Application.Abstractions.Messaging;
+using TaskFlow.Application.Abstractions.MultiTenancy;
 using TaskFlow.Application.Abstractions.Persistence;
 using TaskFlow.Domain.Common;
 using TaskFlow.Domain.Entities;
@@ -13,15 +14,18 @@ public sealed class CreateTaskItemCommandHandler
     private readonly IProjectRepository _projectRepository;
     private readonly ITaskItemRepository _taskItemRepository;
     private readonly IUnitOfWork _unitOfWork;
+    private readonly ICurrentTenant _currentTenant;
 
     public CreateTaskItemCommandHandler(
         IProjectRepository projectRepository,
         ITaskItemRepository taskItemRepository,
-        IUnitOfWork unitOfWork)
+        IUnitOfWork unitOfWork,
+        ICurrentTenant currentTenant)
     {
         _projectRepository = projectRepository;
         _taskItemRepository = taskItemRepository;
         _unitOfWork = unitOfWork;
+        _currentTenant = currentTenant;
     }
 
     public async Task<Result<Guid>> Handle(
@@ -52,6 +56,7 @@ public sealed class CreateTaskItemCommandHandler
         }
 
         var taskResult = TaskItem.Create(
+            _currentTenant.OrganizationId.Value,
             request.ProjectId,
             request.CreatorUserId,
             titleResult.Value,
