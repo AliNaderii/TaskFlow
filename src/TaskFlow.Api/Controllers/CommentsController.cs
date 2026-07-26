@@ -24,6 +24,7 @@ public sealed class CommentsController : ControllerBase
     }
 
     [HttpPost]
+    [Authorize(Policy = "ProjectManager")]
     public async Task<IActionResult> Create(
         Guid taskId,
         CreateCommentRequest request,
@@ -50,6 +51,7 @@ public sealed class CommentsController : ControllerBase
     }
 
     [HttpGet("{commentId:guid}")]
+    [Authorize(Policy = "OrganizationMember")]
     public async Task<IActionResult> GetById(
         Guid taskId,
         Guid commentId,
@@ -70,6 +72,7 @@ public sealed class CommentsController : ControllerBase
     }
 
     [HttpGet]
+    [Authorize(Policy = "OrganizationMember")]
     public async Task<IActionResult> GetByTaskId(
         Guid taskId,
         CancellationToken cancellationToken)
@@ -89,6 +92,7 @@ public sealed class CommentsController : ControllerBase
     }
 
     [HttpPut("{commentId:guid}")]
+    [Authorize(Policy = "ProjectManager")]
     public async Task<IActionResult> Update(
         Guid taskId,
         Guid commentId,
@@ -107,6 +111,7 @@ public sealed class CommentsController : ControllerBase
     }
 
     [HttpDelete("{commentId:guid}")]
+    [Authorize(Policy = "ProjectManager")]
     public async Task<IActionResult> Archive(
         Guid taskId,
         Guid commentId,

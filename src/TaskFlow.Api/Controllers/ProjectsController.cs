@@ -22,6 +22,7 @@ public class ProjectsController : ControllerBase
     }
 
     [HttpGet("{id:guid}")]
+    [Authorize(Policy = "OrganizationMember")]
     public async Task<IActionResult> GetById(
         Guid id,
         CancellationToken cancellationToken)
@@ -38,6 +39,7 @@ public class ProjectsController : ControllerBase
     }
 
     [HttpPut("{id:guid}")]
+    [Authorize(Policy = "OrganizationAdmin")]
     public async Task<IActionResult> Update(
         Guid id,
         UpdateProjectRequest request,
@@ -61,6 +63,7 @@ public class ProjectsController : ControllerBase
     }
 
     [HttpPatch("{id:guid}/archive")]
+    [Authorize(Policy = "OrganizationAdmin")]
     public async Task<IActionResult> Archive(
         Guid id,
         CancellationToken cancellationToken)

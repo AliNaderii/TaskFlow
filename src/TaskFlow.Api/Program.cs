@@ -1,6 +1,7 @@
 using TaskFlow.Application.DependencyInjection;
 using TaskFlow.Infrastructure.DependencyInjection;
 using TaskFlow.Api.Extensions;
+using TaskFlow.Infrastructure.Authorization;
 using TaskFlow.Infrastructure.MultiTenancy;
 
 
@@ -17,6 +18,14 @@ namespace TaskFlow.Api
 
             builder.Services.AddInfrastructure(builder.Configuration);
             builder.Services.AddApplication();
+
+            builder.Services.AddAuthorizationBuilder()
+                .AddPolicy("OrganizationMember", policy =>
+                    policy.Requirements.Add(new OrganizationMemberRequirement()))
+                .AddPolicy("OrganizationAdmin", policy =>
+                    policy.Requirements.Add(new OrganizationAdminRequirement()))
+                .AddPolicy("ProjectManager", policy =>
+                    policy.Requirements.Add(new ProjectManagerRequirement()));
 
             var app = builder.Build();
 

@@ -4,5 +4,6 @@ public enum MembershipRole
 {
     Member = 1,
     Admin = 2,
-    Owner = 3
+    Owner = 3,
+    ProjectManager = 4
 }

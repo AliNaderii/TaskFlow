@@ -55,6 +55,7 @@ public class OrganizationsController : ControllerBase
     }
 
     [HttpPut("{id:guid}")]
+    [Authorize(Policy = "OrganizationAdmin")]
     public async Task<IActionResult> Update(
         Guid id,
         UpdateOrganizationRequest request,
@@ -75,6 +76,7 @@ public class OrganizationsController : ControllerBase
     }
 
     [HttpPatch("{id:guid}/archive")]
+    [Authorize(Policy = "OrganizationAdmin")]
     public async Task<IActionResult> Archive(
         Guid id,
         CancellationToken cancellationToken)

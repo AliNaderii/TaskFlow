@@ -1,4 +1,5 @@
 using System.Text;
+using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Identity;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.IdentityModel.Tokens;
@@ -8,12 +9,14 @@ using Microsoft.AspNetCore.Authentication.JwtBearer;
 using TaskFlow.Application.Abstractions.Services;
 using TaskFlow.Application.Abstractions.Persistence;
 using TaskFlow.Application.Abstractions.Authentication;
+using TaskFlow.Application.Abstractions.Authorization;
 using TaskFlow.Infrastructure.Identity;
 using TaskFlow.Infrastructure.Persistence;
 using TaskFlow.Infrastructure.Authentication;
 using TaskFlow.Infrastructure.Persistence.Repositories;
 using TaskFlow.Application.Abstractions.MultiTenancy;
 using TaskFlow.Infrastructure.MultiTenancy;
+using TaskFlow.Infrastructure.Authorization;
 
 namespace TaskFlow.Infrastructure.DependencyInjection;
 
@@ -96,6 +99,12 @@ public static class DependencyInjection
         services.AddScoped<CurrentTenant>();
         services.AddScoped<ICurrentTenant>(
             provider => provider.GetRequiredService<CurrentTenant>());
+
+        services.AddScoped<IAppAuthorizationService, AuthorizationService>();
+
+        services.AddSingleton<IAuthorizationHandler, OrganizationMemberHandler>();
+        services.AddSingleton<IAuthorizationHandler, OrganizationAdminHandler>();
+        services.AddSingleton<IAuthorizationHandler, ProjectManagerHandler>();
 
         return services;
     }

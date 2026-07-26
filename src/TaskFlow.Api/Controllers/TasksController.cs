@@ -27,6 +27,7 @@ public class TasksController : ControllerBase
     }
 
     [HttpPost]
+    [Authorize(Policy = "ProjectManager")]
     public async Task<IActionResult> Create(
         CreateTaskItemRequest request,
         CancellationToken cancellationToken)
@@ -54,6 +55,7 @@ public class TasksController : ControllerBase
     }
 
     [HttpGet("{id:guid}")]
+    [Authorize(Policy = "OrganizationMember")]
     public async Task<IActionResult> GetById(
         Guid id,
         CancellationToken cancellationToken)
@@ -71,6 +73,7 @@ public class TasksController : ControllerBase
     }
 
     [HttpPut("{id:guid}")]
+    [Authorize(Policy = "ProjectManager")]
     public async Task<IActionResult> Update(
         Guid id,
         UpdateTaskItemRequest request,
@@ -94,6 +97,7 @@ public class TasksController : ControllerBase
     }
 
     [HttpPatch("{id:guid}/archive")]
+    [Authorize(Policy = "ProjectManager")]
     public async Task<IActionResult> Archive(
         Guid id,
         CancellationToken cancellationToken)
@@ -111,6 +115,7 @@ public class TasksController : ControllerBase
     }
 
     [HttpPatch("{id:guid}/assign")]
+    [Authorize(Policy = "ProjectManager")]
     public async Task<IActionResult> AssignUser(
         Guid id,
         AssignUserToTaskRequest request,
@@ -133,6 +138,7 @@ public class TasksController : ControllerBase
     }
 
     [HttpPatch("{id:guid}/unassign")]
+    [Authorize(Policy = "ProjectManager")]
     public async Task<IActionResult> UnassignUser(
         Guid id,
         CancellationToken cancellationToken)
@@ -150,6 +156,7 @@ public class TasksController : ControllerBase
     }
 
     [HttpPatch("{id:guid}/status")]
+    [Authorize(Policy = "ProjectManager")]
     public async Task<IActionResult> ChangeStatus(
         Guid id,
         ChangeTaskItemStatusRequest request,
