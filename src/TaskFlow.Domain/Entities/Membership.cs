@@ -3,7 +3,7 @@ using TaskFlow.Domain.Enums;
 
 namespace TaskFlow.Domain.Entities;
 
-public class Membership : AuditableEntity
+public class Membership : AuditableEntity, ITenantEntity
 {
     public Guid UserId { get; private set; }
     public Guid OrganizationId { get; private set; }

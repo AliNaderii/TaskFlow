@@ -1,6 +1,7 @@
 using TaskFlow.Application.Abstractions.Messaging;
 using TaskFlow.Application.Abstractions.MultiTenancy;
 using TaskFlow.Application.Abstractions.Persistence;
+using TaskFlow.Application.Abstractions.Authentication;
 using TaskFlow.Domain.Common;
 using TaskFlow.Domain.Entities;
 using TaskFlow.Domain.Errors;
@@ -15,23 +16,36 @@ public sealed class CreateCommentCommandHandler
     private readonly ICommentRepository _commentRepository;
     private readonly IUnitOfWork _unitOfWork;
     private readonly ICurrentTenant _currentTenant;
+    private readonly ICurrentUser _currentUser;
 
     public CreateCommentCommandHandler(
         ITaskItemRepository taskItemRepository,
         ICommentRepository commentRepository,
         IUnitOfWork unitOfWork,
-        ICurrentTenant currentTenant)
+        ICurrentTenant currentTenant,
+        ICurrentUser currentUser)
     {
         _taskItemRepository = taskItemRepository;
         _commentRepository = commentRepository;
         _unitOfWork = unitOfWork;
         _currentTenant = currentTenant;
+        _currentUser = currentUser;
     }
 
     public async Task<Result<Guid>> Handle(
         CreateCommentCommand request,
         CancellationToken cancellationToken)
     {
+        if (!_currentTenant.OrganizationId.HasValue)
+        {
+            return Result<Guid>.Failure(TenantErrors.NotFound);
+        }
+
+        if (!_currentUser.UserId.HasValue)
+        {
+            return Result<Guid>.Failure(new Error("auth.user_not_found", "User not authenticated."));
+        }
+
         var taskItem = await _taskItemRepository.GetByIdAsync(
             request.TaskId,
             cancellationToken);
@@ -54,7 +68,7 @@ public sealed class CreateCommentCommandHandler
         var commentResult = Comment.Create(
             _currentTenant.OrganizationId.Value,
             request.TaskId,
-            request.AuthorUserId,
+            _currentUser.UserId.Value,
             contentResult.Value);
 
         if (commentResult.IsFailure)

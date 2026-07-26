@@ -32,7 +32,6 @@ public sealed class CommentsController : ControllerBase
     {
         var command = new CreateCommentCommand(
             taskId,
-            request.AuthorUserId,
             request.Content);
 
         var result = await _sender.Send(

@@ -12,8 +12,5 @@ public sealed class CreateTaskItemCommandValidator
 
         RuleFor(x => x.Title)
             .NotEmpty();
-        
-        RuleFor(x => x.CreatorUserId)
-            .NotEmpty();
     }
 }

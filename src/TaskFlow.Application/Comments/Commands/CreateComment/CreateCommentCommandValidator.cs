@@ -10,9 +10,6 @@ public sealed class CreateCommentCommandValidator
         RuleFor(x => x.TaskId)
             .NotEmpty();
 
-        RuleFor(x => x.AuthorUserId)
-            .NotEmpty();
-
         RuleFor(x => x.Content)
             .NotEmpty();
     }

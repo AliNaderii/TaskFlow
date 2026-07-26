@@ -24,12 +24,10 @@ internal sealed class ProjectRepository : IProjectRepository
                 cancellationToken);
     }
 
-    public async Task<IReadOnlyList<Project>> GetByOrganizationIdAsync(
-        Guid organizationId,
+    public async Task<IReadOnlyList<Project>> GetAllAsync(
         CancellationToken cancellationToken = default)
     {
         return await _context.Projects
-            .Where(x => x.OrganizationId == organizationId)
             .ToListAsync(cancellationToken);
     }
 
@@ -53,15 +51,13 @@ internal sealed class ProjectRepository : IProjectRepository
     }
 
     public async Task<bool> ExistsByNameAsync(
-        Guid organizationId,
         ProjectName name,
         Guid? excludedProjectId = null,
         CancellationToken cancellationToken = default)
     {
         var result = await _context.Projects.AnyAsync(
             project => 
-                project.OrganizationId == organizationId 
-                && project.Name == name
+                project.Name == name
                 && (!excludedProjectId.HasValue || project.Id != excludedProjectId),
             cancellationToken);
         

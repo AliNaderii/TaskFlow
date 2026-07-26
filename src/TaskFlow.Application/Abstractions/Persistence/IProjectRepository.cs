@@ -9,8 +9,7 @@ public interface IProjectRepository
         Guid id,
         CancellationToken cancellationToken = default);
 
-    Task<IReadOnlyList<Project>> GetByOrganizationIdAsync(
-        Guid organizationId,
+    Task<IReadOnlyList<Project>> GetAllAsync(
         CancellationToken cancellationToken = default);
 
     Task<bool> ExistsAsync(
@@ -22,7 +21,6 @@ public interface IProjectRepository
         CancellationToken cancellationToken = default);
     
     Task<bool> ExistsByNameAsync(
-        Guid organizationId,
         ProjectName name,
         Guid? excludedProjectId = null,
         CancellationToken cancellationToken = default);

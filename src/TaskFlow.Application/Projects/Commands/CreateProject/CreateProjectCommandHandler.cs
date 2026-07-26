@@ -63,7 +63,6 @@ public sealed class CreateProjectCommandHandler
         }
 
         var exists = await _projectRepository.ExistsByNameAsync(
-                organizationId,
                 projectNameResult.Value,
                 cancellationToken: cancellationToken);
 

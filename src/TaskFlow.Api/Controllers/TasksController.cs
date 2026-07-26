@@ -34,7 +34,6 @@ public class TasksController : ControllerBase
     {
         var command = new CreateTaskItemCommand(
             request.ProjectId,
-            request.CreatorUserId,
             request.Title,
             request.Description,
             request.Priority,

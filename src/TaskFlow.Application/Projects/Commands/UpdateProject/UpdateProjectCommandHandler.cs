@@ -50,7 +50,6 @@ public sealed class UpdateProjectCommandHandler
         if (project.Name != nameResult.Value)
         {
             var exists = await _projectRepository.ExistsByNameAsync(
-                project.OrganizationId,
                 nameResult.Value,
                 project.Id,
                 cancellationToken);
