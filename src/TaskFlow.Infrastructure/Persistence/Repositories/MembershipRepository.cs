@@ -82,4 +82,15 @@ public sealed class MembershipRepository : IMembershipRepository
                 && x.m.Status == MembershipStatus.Active,
             cancellationToken);
     }
+
+    public async Task<Membership?> GetByUserIdAsync(
+        Guid userId,
+        Guid organizationId,
+        CancellationToken cancellationToken = default)
+    {
+        return await _context.Memberships.FirstOrDefaultAsync(
+            x => x.UserId == userId
+            && x.OrganizationId == organizationId,
+            cancellationToken);
+    }
 }

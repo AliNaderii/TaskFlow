@@ -1,5 +1,6 @@
 using TaskFlow.Domain.Common;
 using TaskFlow.Domain.Enums;
+using TaskFlow.Domain.Errors;
 
 namespace TaskFlow.Domain.Entities;
 
@@ -51,5 +52,85 @@ public class Membership : AuditableEntity, ITenantEntity
                 userId,
                 organizationId,
                 role));
+    }
+
+    public BaseResult Remove()
+    {
+        if (Role == MembershipRole.Owner)
+        {
+            return BaseResult.Failure(MembershipErrors.CannotRemoveOwner);
+        }
+
+        if (Status == MembershipStatus.Removed)
+        {
+            return BaseResult.Success();
+        }
+
+        Status = MembershipStatus.Removed;
+        return BaseResult.Success();
+    }
+
+    public BaseResult Leave()
+    {
+        if (Role == MembershipRole.Owner)
+        {
+            return BaseResult.Failure(MembershipErrors.CannotLeaveAsOwner);
+        }
+
+        if (Status == MembershipStatus.Removed || Status == MembershipStatus.Left)
+        {
+            return BaseResult.Success();
+        }
+
+        Status = MembershipStatus.Left;
+        return BaseResult.Success();
+    }
+
+    public BaseResult ChangeRole(MembershipRole newRole)
+    {
+        if (Role == MembershipRole.Owner)
+        {
+            return BaseResult.Failure(MembershipErrors.CannotChangeOwnerRole);
+        }
+
+        if (newRole == MembershipRole.Owner)
+        {
+            return BaseResult.Failure(MembershipErrors.CannotDemoteOwner);
+        }
+
+        if (Role == newRole)
+        {
+            return BaseResult.Success();
+        }
+
+        Role = newRole;
+        return BaseResult.Success();
+    }
+
+    public BaseResult Suspend()
+    {
+        if (Role == MembershipRole.Owner)
+        {
+            return BaseResult.Failure(MembershipErrors.CannotChangeOwnerRole);
+        }
+
+        if (Status == MembershipStatus.Suspended)
+        {
+            return BaseResult.Failure(MembershipErrors.AlreadySuspended);
+        }
+
+        Status = MembershipStatus.Suspended;
+        return BaseResult.Success();
+    }
+
+    public BaseResult Activate()
+    {
+        if (Status != MembershipStatus.Suspended)
+        {
+            return BaseResult.Failure(MembershipErrors.NotSuspended);
+        }
+
+        Status = MembershipStatus.Active;
+        return BaseResult.Success();
     }
 }

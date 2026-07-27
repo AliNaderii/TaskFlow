@@ -97,7 +97,7 @@ public sealed class AcceptInvitationCommandHandler
             return Result<Guid>.Failure(InvitationErrors.UserAlreadyMember);
         }
 
-        var membershipResult = Membership.Create(
+        var membershipResult = TaskFlow.Domain.Entities.Membership.Create(
             currentUserId,
             invitation.OrganizationId,
             invitation.Role);

@@ -14,6 +14,11 @@ public interface IMembershipRepository
         Guid organizationId,
         CancellationToken cancellationToken = default);
 
+    Task<Membership?> GetByUserIdAsync(
+        Guid userId,
+        Guid organizationId,
+        CancellationToken cancellationToken = default);
+
     Task AddAsync(
         Membership membership,
         CancellationToken cancellationToken = default);

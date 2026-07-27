@@ -3,6 +3,7 @@ using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;
 using TaskFlow.Api.Contracts.Organizations;
 using TaskFlow.Api.Contracts.Organizations.Invitations;
+using TaskFlow.Api.Contracts.Organizations.Membership;
 using TaskFlow.Api.Extensions;
 using TaskFlow.Application.Organizations.Commands.ArchiveOrganization;
 using TaskFlow.Application.Organizations.Commands.CreateOrganization;
@@ -10,11 +11,14 @@ using TaskFlow.Application.Organizations.Commands.UpdateOrganization;
 using TaskFlow.Application.Organizations.Commands.Invitations.AcceptInvitation;
 using TaskFlow.Application.Organizations.Commands.Invitations.CancelInvitation;
 using TaskFlow.Application.Organizations.Commands.Invitations.CreateInvitation;
+using TaskFlow.Application.Organizations.Commands.Membership.RemoveMember;
+using TaskFlow.Application.Organizations.Commands.Membership.LeaveOrganization;
+using TaskFlow.Application.Organizations.Commands.Membership.ChangeMemberRole;
+using TaskFlow.Application.Organizations.Commands.Membership.SuspendMember;
+using TaskFlow.Application.Organizations.Commands.Membership.ActivateMember;
 using TaskFlow.Application.Organizations.Queries.GetOrganizationById;
 using TaskFlow.Application.Organizations.Queries.Invitations.GetInvitationByToken;
 using TaskFlow.Application.Organizations.Queries.Invitations.GetOrganizationInvitations;
-using TaskFlow.Domain.Common;
-
 namespace TaskFlow.Api.Controllers;
 
 [Authorize]
@@ -197,5 +201,94 @@ public class OrganizationsController : ControllerBase
         }
 
         return Ok(result.Value);
+    }
+
+    [HttpDelete("{organizationId:guid}/members/{userId:guid}")]
+    [Authorize(Policy = "OrganizationAdmin")]
+    public async Task<IActionResult> RemoveMember(
+        Guid organizationId,
+        Guid userId,
+        CancellationToken cancellationToken)
+    {
+        var command = new RemoveMemberCommand(userId);
+        var result = await _sender.Send(command, cancellationToken);
+
+        if (result.IsFailure)
+        {
+            return result.Error.ToProblemDetails();
+        }
+
+        return NoContent();
+    }
+
+    [HttpPost("{organizationId:guid}/members/leave")]
+    public async Task<IActionResult> LeaveOrganization(
+        Guid organizationId,
+        CancellationToken cancellationToken)
+    {
+        var command = new LeaveOrganizationCommand();
+        var result = await _sender.Send(command, cancellationToken);
+
+        if (result.IsFailure)
+        {
+            return result.Error.ToProblemDetails();
+        }
+
+        return NoContent();
+    }
+
+    [HttpPut("{organizationId:guid}/members/{userId:guid}/role")]
+    [Authorize(Policy = "OrganizationAdmin")]
+    public async Task<IActionResult> ChangeMemberRole(
+        Guid organizationId,
+        Guid userId,
+        ChangeMemberRoleRequest request,
+        CancellationToken cancellationToken)
+    {
+        var command = new ChangeMemberRoleCommand(userId, request.Role);
+        var result = await _sender.Send(command, cancellationToken);
+
+        if (result.IsFailure)
+        {
+            return result.Error.ToProblemDetails();
+        }
+
+        return NoContent();
+    }
+
+    [HttpPut("{organizationId:guid}/members/{userId:guid}/suspend")]
+    [Authorize(Policy = "OrganizationAdmin")]
+    public async Task<IActionResult> SuspendMember(
+        Guid organizationId,
+        Guid userId,
+        CancellationToken cancellationToken)
+    {
+        var command = new SuspendMemberCommand(userId);
+        var result = await _sender.Send(command, cancellationToken);
+
+        if (result.IsFailure)
+        {
+            return result.Error.ToProblemDetails();
+        }
+
+        return NoContent();
+    }
+
+    [HttpPut("{organizationId:guid}/members/{userId:guid}/activate")]
+    [Authorize(Policy = "OrganizationAdmin")]
+    public async Task<IActionResult> ActivateMember(
+        Guid organizationId,
+        Guid userId,
+        CancellationToken cancellationToken)
+    {
+        var command = new ActivateMemberCommand(userId);
+        var result = await _sender.Send(command, cancellationToken);
+
+        if (result.IsFailure)
+        {
+            return result.Error.ToProblemDetails();
+        }
+
+        return NoContent();
     }
 }
