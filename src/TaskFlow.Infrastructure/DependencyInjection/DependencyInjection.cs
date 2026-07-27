@@ -78,6 +78,7 @@ public static class DependencyInjection
         services.AddScoped<IProjectRepository, ProjectRepository>();
         services.AddScoped<ITaskItemRepository, TaskItemRepository>();
         services.AddScoped<ICommentRepository, CommentRepository>();
+        services.AddScoped<IInvitationRepository, InvitationRepository>();
 
         services.AddScoped<IUnitOfWork>(
             provider => provider.GetRequiredService<ApplicationDbContext>());
@@ -102,9 +103,9 @@ public static class DependencyInjection
 
         services.AddScoped<IAppAuthorizationService, AuthorizationService>();
 
-        services.AddSingleton<IAuthorizationHandler, OrganizationMemberHandler>();
-        services.AddSingleton<IAuthorizationHandler, OrganizationAdminHandler>();
-        services.AddSingleton<IAuthorizationHandler, ProjectManagerHandler>();
+        services.AddScoped<IAuthorizationHandler, OrganizationMemberHandler>();
+        services.AddScoped<IAuthorizationHandler, OrganizationAdminHandler>();
+        services.AddScoped<IAuthorizationHandler, ProjectManagerHandler>();
 
         return services;
     }

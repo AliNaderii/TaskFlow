@@ -16,14 +16,14 @@ public sealed class CurrentUser : ICurrentUser
         _httpContextAccessor = httpContextAccessor;
     }
 
-    public Guid? UserId
+    public Guid? Id
     {
         get
         {
             var userId = _httpContextAccessor.HttpContext?.User
                 .FindFirstValue(JwtRegisteredClaimNames.Sub);
 
-            return Guid.TryParse( userId, out var id) ? id : null;
+            return Guid.TryParse(userId, out var id) ? id : null;
         }
     }
 }

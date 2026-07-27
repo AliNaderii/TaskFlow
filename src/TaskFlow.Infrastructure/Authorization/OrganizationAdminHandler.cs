@@ -26,14 +26,14 @@ public sealed class OrganizationAdminHandler
         AuthorizationHandlerContext context,
         OrganizationAdminRequirement requirement)
     {
-        if (_currentUser.UserId is null || _currentTenant.OrganizationId is null)
+        if (_currentUser.Id is null || _currentTenant.OrganizationId is null)
         {
             context.Fail();
             return;
         }
 
         var isAdmin = await _appAuthorizationService.IsAdminAsync(
-            _currentUser.UserId.Value,
+            _currentUser.Id.Value,
             _currentTenant.OrganizationId.Value);
 
         if (isAdmin)

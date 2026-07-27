@@ -41,7 +41,7 @@ public sealed class CreateCommentCommandHandler
             return Result<Guid>.Failure(TenantErrors.NotFound);
         }
 
-        if (!_currentUser.UserId.HasValue)
+        if (!_currentUser.Id.HasValue)
         {
             return Result<Guid>.Failure(new Error("auth.user_not_found", "User not authenticated."));
         }
@@ -68,7 +68,7 @@ public sealed class CreateCommentCommandHandler
         var commentResult = Comment.Create(
             _currentTenant.OrganizationId.Value,
             request.TaskId,
-            _currentUser.UserId.Value,
+            _currentUser.Id.Value,
             contentResult.Value);
 
         if (commentResult.IsFailure)

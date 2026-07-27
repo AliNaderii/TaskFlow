@@ -21,4 +21,14 @@ public interface IMembershipRepository
     Task<Guid?> GetOrganizationIdForUserAsync(
         Guid userId,
         CancellationToken cancellationToken = default);
+
+    Task<bool> IsUserAdminAsync(
+        Guid userId,
+        Guid organizationId,
+        CancellationToken cancellationToken = default);
+
+    Task<bool> ExistsByEmailAsync(
+        string email,
+        Guid organizationId,
+        CancellationToken cancellationToken = default);
 }

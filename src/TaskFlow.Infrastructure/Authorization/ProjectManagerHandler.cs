@@ -26,14 +26,14 @@ public sealed class ProjectManagerHandler
         AuthorizationHandlerContext context,
         ProjectManagerRequirement requirement)
     {
-        if (_currentUser.UserId is null || _currentTenant.OrganizationId is null)
+        if (_currentUser.Id is null || _currentTenant.OrganizationId is null)
         {
             context.Fail();
             return;
         }
 
         var isProjectManager = await _appAuthorizationService.IsProjectManagerAsync(
-            _currentUser.UserId.Value,
+            _currentUser.Id.Value,
             _currentTenant.OrganizationId.Value);
 
         if (isProjectManager)

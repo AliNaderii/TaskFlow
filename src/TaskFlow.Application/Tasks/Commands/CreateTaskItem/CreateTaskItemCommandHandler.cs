@@ -41,7 +41,7 @@ public sealed class CreateTaskItemCommandHandler
             return Result<Guid>.Failure(TenantErrors.NotFound);
         }
 
-        if (!_currentUser.UserId.HasValue)
+        if (!_currentUser.Id.HasValue)
         {
             return Result<Guid>.Failure(new Error("auth.user_not_found", "User not authenticated."));
         }
@@ -72,7 +72,7 @@ public sealed class CreateTaskItemCommandHandler
         var taskResult = TaskItem.Create(
             _currentTenant.OrganizationId.Value,
             request.ProjectId,
-            _currentUser.UserId.Value,
+            _currentUser.Id.Value,
             titleResult.Value,
             descriptionResult.Value,
             request.Priority,

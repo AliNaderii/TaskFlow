@@ -21,11 +21,11 @@ public sealed class TenantContextInitializer : ITenantContextInitializer
 
     public async Task InitializeAsync(CancellationToken cancellationToken = default)
     {
-        if (_currentUser.UserId is null)
+        if (_currentUser.Id is null)
             return;
 
         var organizationId = await _tenantResolver.ResolveAsync(
-            _currentUser.UserId.Value,
+            _currentUser.Id.Value,
             cancellationToken);
 
         if (organizationId.HasValue)

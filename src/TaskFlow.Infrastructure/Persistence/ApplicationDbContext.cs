@@ -38,6 +38,7 @@ public class ApplicationDbContext
     public DbSet<Comment> Comments => Set<Comment>();
     public DbSet<Membership> Memberships => Set<Membership>();
     public DbSet<RefreshToken> RefreshTokens => Set<RefreshToken>();
+    public DbSet<Invitation> Invitations => Set<Invitation>();
 
     private void ApplyTenantFilters(
         ModelBuilder modelBuilder)
