@@ -120,9 +120,12 @@ public class TasksController : ControllerBase
         AssignUserToTaskRequest request,
         CancellationToken cancellationToken)
     {
+        var assignedByUserId = User.GetUserId() ?? Guid.Empty;
+        
         var command = new AssignUserToTaskItemCommand(
             id,
-            request.AssigneeUserId);
+            request.AssigneeUserId,
+            assignedByUserId);
 
         var result = await _sender.Send(
             command,
@@ -161,9 +164,12 @@ public class TasksController : ControllerBase
         ChangeTaskItemStatusRequest request,
         CancellationToken cancellationToken)
     {
+        var changedByUserId = User.GetUserId() ?? Guid.Empty;
+        
         var command = new ChangeTaskItemStatusCommand(
             id,
-            request.Status);
+            request.Status,
+            changedByUserId);
 
         var result = await _sender.Send(
             command,

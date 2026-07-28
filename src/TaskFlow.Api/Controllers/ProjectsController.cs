@@ -68,7 +68,9 @@ public class ProjectsController : ControllerBase
         Guid id,
         CancellationToken cancellationToken)
     {
-        var command = new ArchiveProjectCommand(id);
+        var archivedByUserId = User.GetUserId() ?? Guid.Empty;
+        
+        var command = new ArchiveProjectCommand(id, archivedByUserId);
 
         var result = await _sender.Send(
             command,

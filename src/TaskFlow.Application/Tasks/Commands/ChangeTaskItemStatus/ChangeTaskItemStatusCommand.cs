@@ -5,5 +5,6 @@ namespace TaskFlow.Application.Tasks.Commands.ChangeTaskItemStatus;
 
 public sealed record ChangeTaskItemStatusCommand(
     Guid TaskItemId,
-    TaskItemStatus Status)
+    TaskItemStatus Status,
+    Guid ChangedByUserId)
     : ICommand;

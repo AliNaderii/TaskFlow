@@ -1,4 +1,5 @@
 using TaskFlow.Domain.Common;
+using TaskFlow.Domain.Events;
 using TaskFlow.Domain.Enums;
 using TaskFlow.Domain.ValueObjects;
 using TaskFlow.Domain.Errors;
@@ -123,7 +124,7 @@ public sealed class TaskItem : AuditableEntity, ITenantEntity
         return BaseResult.Success();
     }
 
-    public BaseResult AssignTo(Guid userId)
+    public BaseResult AssignTo(Guid userId, Guid assignedByUserId)
     {
         if (IsArchived)
         {
@@ -136,6 +137,8 @@ public sealed class TaskItem : AuditableEntity, ITenantEntity
         }
     
         AssigneeUserId = userId;
+        
+        AddDomainEvent(TaskAssignedEvent.Create(Id, userId, assignedByUserId));
     
         return BaseResult.Success();
     }
@@ -157,7 +160,7 @@ public sealed class TaskItem : AuditableEntity, ITenantEntity
         return BaseResult.Success();
     }
     
-        public BaseResult ChangeStatus(TaskItemStatus status)
+    public BaseResult ChangeStatus(TaskItemStatus status, Guid changedByUserId)
     {
         if (IsArchived)
         {
@@ -170,6 +173,11 @@ public sealed class TaskItem : AuditableEntity, ITenantEntity
         }
     
         Status = status;
+        
+        if (status == TaskItemStatus.Done)
+        {
+            AddDomainEvent(TaskCompletedEvent.Create(Id, changedByUserId));
+        }
     
         return BaseResult.Success();
     }

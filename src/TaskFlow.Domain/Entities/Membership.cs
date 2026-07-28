@@ -1,4 +1,5 @@
 using TaskFlow.Domain.Common;
+using TaskFlow.Domain.Events;
 using TaskFlow.Domain.Enums;
 using TaskFlow.Domain.Errors;
 
@@ -47,11 +48,14 @@ public class Membership : AuditableEntity, ITenantEntity
                     "Organization is required."));
         }
 
-        return Result<Membership>.Success(
-            new Membership(
-                userId,
-                organizationId,
-                role));
+        var membership = new Membership(
+            userId,
+            organizationId,
+            role);
+
+        membership.AddDomainEvent(MembershipAddedEvent.Create(membership.Id, organizationId, userId, role.ToString()));
+
+        return Result<Membership>.Success(membership);
     }
 
     public BaseResult Remove()

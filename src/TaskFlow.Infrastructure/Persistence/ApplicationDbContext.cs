@@ -5,6 +5,7 @@ using Microsoft.AspNetCore.Identity.EntityFrameworkCore;
 using TaskFlow.Domain.Common;
 using TaskFlow.Domain.Entities;
 using TaskFlow.Application.Abstractions.Persistence;
+using TaskFlow.Application.Abstractions.Messaging;
 using TaskFlow.Application.Abstractions.MultiTenancy;
 using TaskFlow.Infrastructure.Identity;
 using TaskFlow.Infrastructure.Authentication;
@@ -15,11 +16,15 @@ public class ApplicationDbContext
     , IUnitOfWork
 {
     private readonly ICurrentTenant _currentTenant;
+    private readonly IDomainEventDispatcher _domainEventDispatcher;
+    
     public ApplicationDbContext(
         DbContextOptions<ApplicationDbContext> options,
-        ICurrentTenant currentTenant ) : base(options)
+        ICurrentTenant currentTenant,
+        IDomainEventDispatcher domainEventDispatcher) : base(options)
     {
         _currentTenant = currentTenant;
+        _domainEventDispatcher = domainEventDispatcher;
     }
 
     protected override void OnModelCreating(ModelBuilder modelBuilder)
@@ -64,5 +69,29 @@ public class ApplicationDbContext
         modelBuilder.Entity<T>()
             .HasQueryFilter(
             entity => entity.OrganizationId == _currentTenant.OrganizationId);
+    }
+
+    public override async Task<int> SaveChangesAsync(
+        CancellationToken cancellationToken = default)
+    {
+        var domainEntities = ChangeTracker
+            .Entries<AuditableEntity>()
+            .Where(x => x.Entity.DomainEvents.Any())
+            .ToList();
+
+        var domainEvents = domainEntities
+            .SelectMany(x => x.Entity.DomainEvents)
+            .ToList();
+
+        var result = await base.SaveChangesAsync(cancellationToken);
+
+        if (domainEvents.Any())
+        {
+            await _domainEventDispatcher.DispatchAsync(domainEvents, cancellationToken);
+
+            domainEntities.ForEach(e => e.Entity.ClearDomainEvents());
+        }
+
+        return result;
     }
 }

@@ -1,4 +1,5 @@
 using TaskFlow.Domain.Common;
+using TaskFlow.Domain.Events;
 using TaskFlow.Domain.Errors;
 using TaskFlow.Domain.ValueObjects;
 
@@ -48,6 +49,8 @@ public sealed class Comment : AuditableEntity, ITenantEntity
             taskId,
             authorUserId,
             content);
+
+        comment.AddDomainEvent(CommentCreatedEvent.Create(comment.Id, taskId, authorUserId));
 
         return Result<Comment>.Success(comment);
     }

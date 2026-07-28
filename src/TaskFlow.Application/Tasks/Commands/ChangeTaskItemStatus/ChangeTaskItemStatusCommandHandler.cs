@@ -32,7 +32,7 @@ public sealed class ChangeTaskItemStatusCommandHandler
             return BaseResult.Failure(TaskItemErrors.NotFound);
         }
 
-        var result = taskItem.ChangeStatus(request.Status);
+        var result = taskItem.ChangeStatus(request.Status, request.ChangedByUserId);
 
         if (result.IsFailure)
         {

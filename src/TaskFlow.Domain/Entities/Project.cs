@@ -1,4 +1,5 @@
 using TaskFlow.Domain.Common;
+using TaskFlow.Domain.Events;
 using TaskFlow.Domain.ValueObjects;
 using TaskFlow.Domain.Errors;
 
@@ -66,7 +67,7 @@ public sealed class Project : AuditableEntity, ITenantEntity
         return BaseResult.Success();
     }
 
-    public BaseResult Archive()
+    public BaseResult Archive(Guid archivedByUserId)
     {
         if (IsArchived)
         {
@@ -74,6 +75,8 @@ public sealed class Project : AuditableEntity, ITenantEntity
         }
 
         IsArchived = true;
+        
+        AddDomainEvent(ProjectArchivedEvent.Create(Id, archivedByUserId));
 
         return BaseResult.Success();
     }

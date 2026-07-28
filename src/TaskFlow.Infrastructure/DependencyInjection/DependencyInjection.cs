@@ -14,7 +14,9 @@ using TaskFlow.Infrastructure.Identity;
 using TaskFlow.Infrastructure.Persistence;
 using TaskFlow.Infrastructure.Authentication;
 using TaskFlow.Infrastructure.Persistence.Repositories;
+using TaskFlow.Application.Abstractions.Messaging;
 using TaskFlow.Application.Abstractions.MultiTenancy;
+using TaskFlow.Infrastructure.Messaging;
 using TaskFlow.Infrastructure.MultiTenancy;
 using TaskFlow.Infrastructure.Authorization;
 
@@ -106,6 +108,8 @@ public static class DependencyInjection
         services.AddScoped<IAuthorizationHandler, OrganizationMemberHandler>();
         services.AddScoped<IAuthorizationHandler, OrganizationAdminHandler>();
         services.AddScoped<IAuthorizationHandler, ProjectManagerHandler>();
+
+        services.AddScoped<IDomainEventDispatcher, DomainEventDispatcher>();
 
         return services;
     }

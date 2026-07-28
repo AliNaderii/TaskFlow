@@ -1,5 +1,6 @@
 using TaskFlow.Application.Abstractions.Messaging;
 using TaskFlow.Application.Abstractions.Persistence;
+using TaskFlow.Application.Abstractions.Authentication;
 using TaskFlow.Domain.Common;
 using TaskFlow.Domain.Errors;
 
@@ -13,19 +14,22 @@ public sealed class AssignUserToTaskCommandHandler
     private readonly IProjectRepository _projectRepository;
     private readonly IMembershipRepository _membershipRepository;
     private readonly IUnitOfWork _unitOfWork;
+    private readonly ICurrentUser _currentUser;
 
     public AssignUserToTaskCommandHandler(
         ITaskItemRepository taskItemRepository,
         IUserRepository userRepository,
         IProjectRepository projectRepository,
         IMembershipRepository membershipRepository,
-        IUnitOfWork unitOfWork)
+        IUnitOfWork unitOfWork,
+        ICurrentUser currentUser)
     {
         _taskItemRepository = taskItemRepository;
         _userRepository = userRepository;
         _projectRepository = projectRepository;
         _membershipRepository = membershipRepository;
         _unitOfWork = unitOfWork;
+        _currentUser = currentUser;
     }
 
     public async Task<BaseResult> Handle(
@@ -69,7 +73,9 @@ public sealed class AssignUserToTaskCommandHandler
             return BaseResult.Failure(MembershipErrors.NotFound);
         }
 
-        var result = taskItem.AssignTo(request.AssigneeUserId);
+        var assignedByUserId = _currentUser.Id ?? request.AssignedByUserId;
+
+        var result = taskItem.AssignTo(request.AssigneeUserId, assignedByUserId);
 
         if (result.IsFailure)
         {

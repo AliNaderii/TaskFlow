@@ -32,7 +32,7 @@ public sealed class ArchiveProjectCommandHandler
             return BaseResult.Failure(ProjectErrors.NotFound);
         }
 
-        var result = project.Archive();
+        var result = project.Archive(request.ArchivedByUserId);
 
         if (result.IsFailure)
         {
