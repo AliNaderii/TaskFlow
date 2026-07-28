@@ -43,4 +43,29 @@ public static class MembershipErrors
         new(
             "Membership.MemberNotFound",
             "Member not found in organization.");
+
+    public static readonly Error CannotTransferOwnershipToSelf =
+        new(
+            "Membership.CannotTransferOwnershipToSelf",
+            "Cannot transfer ownership to yourself.");
+
+    public static readonly Error TargetMemberNotFound =
+        new(
+            "Membership.TargetMemberNotFound",
+            "Target member not found in organization.");
+
+    public static readonly Error TargetMemberNotActive =
+        new(
+            "Membership.TargetMemberNotActive",
+            "Target member must be active to receive ownership.");
+
+    public static readonly Error TargetMemberAlreadyOwner =
+        new(
+            "Membership.TargetMemberAlreadyOwner",
+            "Target member is already an owner.");
+
+    public static readonly Error OnlyOwnerCanTransferOwnership =
+        new(
+            "Membership.OnlyOwnerCanTransferOwnership",
+            "Only the organization owner can transfer ownership.");
 }

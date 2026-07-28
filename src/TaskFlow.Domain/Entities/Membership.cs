@@ -133,4 +133,40 @@ public class Membership : AuditableEntity, ITenantEntity
         Status = MembershipStatus.Active;
         return BaseResult.Success();
     }
+
+    public BaseResult TransferOwnership(Membership targetMembership)
+    {
+        if (Role != MembershipRole.Owner)
+        {
+            return BaseResult.Failure(MembershipErrors.OnlyOwnerCanTransferOwnership);
+        }
+
+        if (targetMembership == null)
+        {
+            return BaseResult.Failure(MembershipErrors.TargetMemberNotFound);
+        }
+
+        if (targetMembership.UserId == UserId)
+        {
+            return BaseResult.Failure(MembershipErrors.CannotTransferOwnershipToSelf);
+        }
+
+        if (targetMembership.Role == MembershipRole.Owner)
+        {
+            return BaseResult.Failure(MembershipErrors.TargetMemberAlreadyOwner);
+        }
+
+        if (targetMembership.Status != MembershipStatus.Active)
+        {
+            return BaseResult.Failure(MembershipErrors.TargetMemberNotActive);
+        }
+
+        // Current owner becomes Admin
+        Role = MembershipRole.Admin;
+
+        // Target member becomes Owner
+        targetMembership.Role = MembershipRole.Owner;
+
+        return BaseResult.Success();
+    }
 }

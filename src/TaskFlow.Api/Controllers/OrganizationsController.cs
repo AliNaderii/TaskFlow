@@ -16,6 +16,7 @@ using TaskFlow.Application.Organizations.Commands.Membership.LeaveOrganization;
 using TaskFlow.Application.Organizations.Commands.Membership.ChangeMemberRole;
 using TaskFlow.Application.Organizations.Commands.Membership.SuspendMember;
 using TaskFlow.Application.Organizations.Commands.Membership.ActivateMember;
+using TaskFlow.Application.Organizations.Commands.Membership.TransferOwnership;
 using TaskFlow.Application.Organizations.Queries.GetOrganizationById;
 using TaskFlow.Application.Organizations.Queries.Invitations.GetInvitationByToken;
 using TaskFlow.Application.Organizations.Queries.Invitations.GetOrganizationInvitations;
@@ -282,6 +283,24 @@ public class OrganizationsController : ControllerBase
         CancellationToken cancellationToken)
     {
         var command = new ActivateMemberCommand(userId);
+        var result = await _sender.Send(command, cancellationToken);
+
+        if (result.IsFailure)
+        {
+            return result.Error.ToProblemDetails();
+        }
+
+        return NoContent();
+    }
+
+    [HttpPut("{organizationId:guid}/members/{userId:guid}/transfer-ownership")]
+    [Authorize(Policy = "OrganizationAdmin")]
+    public async Task<IActionResult> TransferOwnership(
+        Guid organizationId,
+        Guid userId,
+        CancellationToken cancellationToken)
+    {
+        var command = new TransferOwnershipCommand(userId);
         var result = await _sender.Send(command, cancellationToken);
 
         if (result.IsFailure)

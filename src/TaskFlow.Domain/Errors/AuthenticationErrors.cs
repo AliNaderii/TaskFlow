@@ -18,4 +18,9 @@ public static class AuthenticationErrors
         new(
             "Authentication.InvalidRefreshToken",
             "Refresh token is invalid.");
+
+    public static readonly Error UserNotFound =
+        new(
+            "Authentication.UserNotFound",
+            "User not found.");
 }
