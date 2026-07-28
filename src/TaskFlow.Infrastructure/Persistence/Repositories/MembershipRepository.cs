@@ -93,4 +93,13 @@ public sealed class MembershipRepository : IMembershipRepository
             && x.OrganizationId == organizationId,
             cancellationToken);
     }
+
+    public async Task<IReadOnlyList<Membership>> GetByOrganizationIdAsync(
+        Guid organizationId,
+        CancellationToken cancellationToken = default)
+    {
+        return await _context.Memberships
+            .Where(x => x.OrganizationId == organizationId)
+            .ToListAsync(cancellationToken);
+    }
 }

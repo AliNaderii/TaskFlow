@@ -81,6 +81,7 @@ public static class DependencyInjection
         services.AddScoped<ITaskItemRepository, TaskItemRepository>();
         services.AddScoped<ICommentRepository, CommentRepository>();
         services.AddScoped<IInvitationRepository, InvitationRepository>();
+        services.AddScoped<INotificationRepository, NotificationRepository>();
 
         services.AddScoped<IUnitOfWork>(
             provider => provider.GetRequiredService<ApplicationDbContext>());

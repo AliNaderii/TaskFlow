@@ -36,4 +36,8 @@ public interface IMembershipRepository
         string email,
         Guid organizationId,
         CancellationToken cancellationToken = default);
+
+    Task<IReadOnlyList<Membership>> GetByOrganizationIdAsync(
+        Guid organizationId,
+        CancellationToken cancellationToken = default);
 }

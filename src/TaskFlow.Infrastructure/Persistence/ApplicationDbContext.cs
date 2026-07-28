@@ -44,6 +44,7 @@ public class ApplicationDbContext
     public DbSet<Membership> Memberships => Set<Membership>();
     public DbSet<RefreshToken> RefreshTokens => Set<RefreshToken>();
     public DbSet<Invitation> Invitations => Set<Invitation>();
+    public DbSet<Notification> Notifications => Set<Notification>();
 
     private void ApplyTenantFilters(
         ModelBuilder modelBuilder)
