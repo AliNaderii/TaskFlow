@@ -11,13 +11,16 @@ public sealed class LoginCommandHandler
 {
     private readonly IIdentityService _identityService;
     private readonly IJwtTokenProvider _jwtTokenProvider;
+    private readonly IRefreshTokenService _refreshTokenService;
 
     public LoginCommandHandler(
         IIdentityService identityService,
-        IJwtTokenProvider jwtTokenProvider)
+        IJwtTokenProvider jwtTokenProvider,
+        IRefreshTokenService refreshTokenService)
     {
         _identityService = identityService;
         _jwtTokenProvider = jwtTokenProvider;
+        _refreshTokenService = refreshTokenService;
     }
 
     public async Task<Result<LoginResponse>> Handle(
@@ -38,10 +41,15 @@ public sealed class LoginCommandHandler
             userId.Value, 
             request.Email);
 
+        var refreshTokenResult = await _refreshTokenService.CreateAsync(
+            userId.Value,
+            request.Email,
+            cancellationToken);
+
         return Result<LoginResponse>.Success(
             new LoginResponse(
                 userId.Value, 
                 token,
-                null));
+                refreshTokenResult.Token));
     }
 }
