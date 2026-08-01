@@ -21,4 +21,17 @@ internal sealed class EmailService : IEmailService
 
         return Task.FromResult(BaseResult.Success());
     }
+
+    public Task<BaseResult> SendEmailAsync(
+        Guid userId,
+        string subject,
+        string body,
+        CancellationToken cancellationToken = default)
+    {
+        Console.WriteLine($"[EMAIL] Sending email to user: {userId}");
+        Console.WriteLine($"[EMAIL] Subject: {subject}");
+        Console.WriteLine($"[EMAIL] Body: {body}");
+
+        return Task.FromResult(BaseResult.Success());
+    }
 }

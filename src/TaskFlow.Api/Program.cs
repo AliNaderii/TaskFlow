@@ -1,8 +1,11 @@
+using Hangfire;
+using TaskFlow.Application.Abstractions.BackgroundJobs;
 using TaskFlow.Application.DependencyInjection;
 using TaskFlow.Infrastructure.DependencyInjection;
 using TaskFlow.Api.Extensions;
 using TaskFlow.Infrastructure.Authorization;
 using TaskFlow.Infrastructure.MultiTenancy;
+using TaskFlow.Infrastructure.BackgroundJobs;
 
 
 namespace TaskFlow.Api
@@ -44,6 +47,21 @@ namespace TaskFlow.Api
             app.UseAuthentication();
             app.UseTenant();
             app.UseAuthorization();
+            
+            // Hangfire Dashboard - secured with OrganizationAdmin policy
+            app.UseHangfireDashboard("/hangfire", new DashboardOptions
+            {
+                Authorization = [new HangfireAuthorizationFilter("OrganizationAdmin")],
+                DashboardTitle = "TaskFlow Background Jobs"
+            });
+            
+            // Configure recurring jobs
+            using (var scope = app.Services.CreateScope())
+            {
+                var recurringJobService = scope.ServiceProvider.GetRequiredService<IRecurringJobService>();
+                recurringJobService.ConfigureRecurringJobs();
+            }
+
             app.MapControllers();
 
             app.Run();

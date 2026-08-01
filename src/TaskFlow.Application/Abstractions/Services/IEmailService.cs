@@ -11,4 +11,10 @@ public interface IEmailService
         string invitationLink,
         DateTime expiresAt,
         CancellationToken cancellationToken = default);
+
+    Task<BaseResult> SendEmailAsync(
+        Guid userId,
+        string subject,
+        string body,
+        CancellationToken cancellationToken = default);
 }

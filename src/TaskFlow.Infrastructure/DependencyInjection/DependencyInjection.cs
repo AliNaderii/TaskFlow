@@ -6,10 +6,13 @@ using Microsoft.IdentityModel.Tokens;
 using Microsoft.Extensions.Configuration;
 using Microsoft.Extensions.DependencyInjection;
 using Microsoft.AspNetCore.Authentication.JwtBearer;
+using Hangfire;
+using Hangfire.SqlServer;
 using TaskFlow.Application.Abstractions.Services;
 using TaskFlow.Application.Abstractions.Persistence;
 using TaskFlow.Application.Abstractions.Authentication;
 using TaskFlow.Application.Abstractions.Authorization;
+using TaskFlow.Application.Abstractions.BackgroundJobs;
 using TaskFlow.Infrastructure.Identity;
 using TaskFlow.Infrastructure.Persistence;
 using TaskFlow.Infrastructure.Authentication;
@@ -19,6 +22,7 @@ using TaskFlow.Application.Abstractions.MultiTenancy;
 using TaskFlow.Infrastructure.Messaging;
 using TaskFlow.Infrastructure.MultiTenancy;
 using TaskFlow.Infrastructure.Authorization;
+using TaskFlow.Infrastructure.BackgroundJobs;
 
 namespace TaskFlow.Infrastructure.DependencyInjection;
 
@@ -111,6 +115,20 @@ public static class DependencyInjection
         services.AddScoped<IAuthorizationHandler, ProjectManagerHandler>();
 
         services.AddScoped<IDomainEventDispatcher, DomainEventDispatcher>();
+
+        // Hangfire
+        services.AddHangfire(config =>
+        {
+            config.UseSqlServerStorage(configuration.GetConnectionString("DefaultConnection"));
+            config.UseSimpleAssemblyNameTypeSerializer();
+            config.UseRecommendedSerializerSettings();
+        });
+        services.AddHangfireServer();
+
+        // Background Jobs
+        services.AddScoped<IReminderJobService, ReminderJobService>();
+        services.AddScoped<ICleanupJobService, CleanupJobService>();
+        services.AddScoped<IRecurringJobService, RecurringJobService>();
 
         return services;
     }
