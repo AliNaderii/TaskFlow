@@ -8,6 +8,7 @@ using TaskFlow.Application.Comments.Commands.CreateComment;
 using TaskFlow.Application.Comments.Commands.UpdateComment;
 using TaskFlow.Application.Comments.Queries.GetCommentById;
 using TaskFlow.Application.Comments.Queries.GetCommentsByTaskId;
+using TaskFlow.Application.Comments.Queries.SearchComments;
 
 namespace TaskFlow.Api.Controllers;
 
@@ -21,6 +22,34 @@ public sealed class CommentsController : ControllerBase
     public CommentsController(ISender sender)
     {
         _sender = sender;
+    }
+
+    [HttpGet("search")]
+    [Authorize(Policy = "OrganizationMember")]
+    public async Task<IActionResult> Search(
+        Guid taskId,
+        [FromQuery] SearchCommentsRequest request,
+        CancellationToken cancellationToken)
+    {
+        var query = new SearchCommentsQuery(
+            taskId,
+            request.Keyword,
+            request.AuthorUserId,
+            request.CreatedAtFrom,
+            request.CreatedAtTo,
+            request.Page,
+            request.PageSize,
+            request.SortBy,
+            request.SortDirection);
+
+        var result = await _sender.Send(query, cancellationToken);
+
+        if (result.IsFailure)
+        {
+            return result.Error.ToProblemDetails();
+        }
+
+        return Ok(result.Value);
     }
 
     [HttpPost]

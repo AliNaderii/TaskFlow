@@ -24,4 +24,13 @@ public interface IProjectRepository
         ProjectName name,
         Guid? excludedProjectId = null,
         CancellationToken cancellationToken = default);
+
+    Task<(IReadOnlyList<Project> Items, int TotalCount)> SearchAsync(
+        string? keyword,
+        bool? isArchived,
+        int page,
+        int pageSize,
+        string? sortBy,
+        string? sortDirection,
+        CancellationToken cancellationToken = default);
 }

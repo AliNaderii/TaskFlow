@@ -63,4 +63,83 @@ internal sealed class ProjectRepository : IProjectRepository
         
         return result;
     }
+
+    public async Task<(IReadOnlyList<Project> Items, int TotalCount)> SearchAsync(
+        string? keyword,
+        bool? isArchived,
+        int page,
+        int pageSize,
+        string? sortBy,
+        string? sortDirection,
+        CancellationToken cancellationToken = default)
+    {
+        var query = _context.Projects.AsQueryable();
+
+        if (!string.IsNullOrWhiteSpace(keyword))
+        {
+            var kw = keyword.Trim().ToLower();
+            query = query.Where(p => 
+                p.Name.Value.ToLower().Contains(kw) ||
+                (p.Description != null && p.Description.Value.ToLower().Contains(kw)));
+        }
+
+        if (isArchived.HasValue)
+        {
+            query = query.Where(p => p.IsArchived == isArchived.Value);
+        }
+
+        query = ApplySorting(query, sortBy, sortDirection);
+
+        var totalCount = await query.CountAsync(cancellationToken);
+
+        var items = await query
+            .Skip((page - 1) * pageSize)
+            .Take(pageSize)
+            .ToListAsync(cancellationToken);
+
+        return (items, totalCount);
+    }
+
+    private static IQueryable<Project> ApplySorting(
+        IQueryable<Project> query,
+        string? sortBy,
+        string? sortDirection)
+    {
+        var direction = string.Equals(sortDirection, "desc", StringComparison.OrdinalIgnoreCase)
+            ? "desc" : "asc";
+
+        var property = sortBy?.ToLowerInvariant() switch
+        {
+            "name" => "name",
+            "createdat" => "createdat",
+            "updatedat" => "updatedat",
+            "archivedat" => "archivedat",
+            _ => "createdat"
+        };
+
+        if (direction == "desc")
+        {
+            query = property switch
+            {
+                "name" => query.OrderByDescending(p => p.Name.Value),
+                "createdat" => query.OrderByDescending(p => p.CreatedAt),
+                "updatedat" => query.OrderByDescending(p => p.UpdatedAt),
+                "archivedat" => query.OrderByDescending(p => p.ArchivedAt),
+                _ => query.OrderByDescending(p => p.CreatedAt)
+            };
+        }
+        else
+        {
+            query = property switch
+            {
+                "name" => query.OrderBy(p => p.Name.Value),
+                "createdat" => query.OrderBy(p => p.CreatedAt),
+                "updatedat" => query.OrderBy(p => p.UpdatedAt),
+                "archivedat" => query.OrderBy(p => p.ArchivedAt),
+                _ => query.OrderBy(p => p.CreatedAt)
+            };
+        }
+
+        return query;
+    }
 }

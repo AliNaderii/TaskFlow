@@ -15,4 +15,16 @@ public interface ICommentRepository
     Task AddAsync(
         Comment comment,
         CancellationToken cancellationToken = default);
+
+    Task<(IReadOnlyList<Comment> Items, int TotalCount)> SearchAsync(
+        Guid? taskId,
+        string? keyword,
+        Guid? authorUserId,
+        DateTime? createdAtFrom,
+        DateTime? createdAtTo,
+        int page,
+        int pageSize,
+        string? sortBy,
+        string? sortDirection,
+        CancellationToken cancellationToken = default);
 }

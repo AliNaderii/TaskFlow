@@ -6,6 +6,7 @@ using TaskFlow.Api.Extensions;
 using TaskFlow.Application.Projects.Commands.ArchiveProject;
 using TaskFlow.Application.Projects.Commands.UpdateProject;
 using TaskFlow.Application.Projects.Queries.GetProjectById;
+using TaskFlow.Application.Projects.Queries.SearchProjects;
 
 namespace TaskFlow.Api.Controllers;
 
@@ -21,14 +22,38 @@ public class ProjectsController : ControllerBase
         _sender = sender;
     }
 
+    [HttpGet]
+    [Authorize(Policy = "OrganizationMember")]
+    public async Task<IActionResult> Search(
+        [FromQuery] SearchProjectsRequest request,
+        CancellationToken cancellationToken)
+    {
+        var query = new SearchProjectsQuery(
+            request.Keyword,
+            request.IsArchived,
+            request.Page,
+            request.PageSize,
+            request.SortBy,
+            request.SortDirection);
+
+        var result = await _sender.Send(query, cancellationToken);
+
+        if (result.IsFailure)
+        {
+            return result.Error.ToProblemDetails();
+        }
+
+        return Ok(result.Value);
+    }
+
     [HttpGet("{id:guid}")]
     [Authorize(Policy = "OrganizationMember")]
     public async Task<IActionResult> GetById(
         Guid id,
         CancellationToken cancellationToken)
     {
-        var command = new GetProjectByIdQuery(id);
-        var result = await _sender.Send(command, cancellationToken);
+        var query = new GetProjectByIdQuery(id);
+        var result = await _sender.Send(query, cancellationToken);
 
         if (result.IsFailure)
         {

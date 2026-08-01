@@ -11,6 +11,7 @@ using TaskFlow.Application.Tasks.Commands.CreateTaskItem;
 using TaskFlow.Application.Tasks.Commands.UnassignUserFromTaskItem;
 using TaskFlow.Application.Tasks.Commands.UpdateTaskItem;
 using TaskFlow.Application.Tasks.Queries.GetTaskItemById;
+using TaskFlow.Application.Tasks.Queries.SearchTaskItems;
 
 namespace TaskFlow.Api.Controllers;
 
@@ -24,6 +25,36 @@ public class TasksController : ControllerBase
     public TasksController(ISender sender)
     {
         _sender = sender;
+    }
+
+    [HttpGet]
+    [Authorize(Policy = "OrganizationMember")]
+    public async Task<IActionResult> Search(
+        [FromQuery] SearchTaskItemsRequest request,
+        CancellationToken cancellationToken)
+    {
+        var query = new SearchTaskItemsQuery(
+            request.ProjectId,
+            request.Keyword,
+            request.Status,
+            request.Priority,
+            request.AssigneeUserId,
+            request.DueDateFrom,
+            request.DueDateTo,
+            request.IsArchived,
+            request.Page,
+            request.PageSize,
+            request.SortBy,
+            request.SortDirection);
+
+        var result = await _sender.Send(query, cancellationToken);
+
+        if (result.IsFailure)
+        {
+            return result.Error.ToProblemDetails();
+        }
+
+        return Ok(result.Value);
     }
 
     [HttpPost]
