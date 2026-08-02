@@ -1,5 +1,6 @@
 using MediatR;
 using Microsoft.AspNetCore.Mvc;
+using System.IO;
 using TaskFlow.Api.Extensions;
 using TaskFlow.Api.Contracts.Authentication;
 using TaskFlow.Application.Authentication.Login;
@@ -28,6 +29,10 @@ public class AuthenticationController : ControllerBase
         ApiRegisterRequest request,
         CancellationToken cancellationToken)
     {
+        var logPath = System.IO.Path.Combine(System.IO.Path.GetTempPath(), "taskflow_auth_debug.log");
+        System.IO.File.AppendAllText(logPath, $"[DEBUG] AuthenticationController.Register called" + Environment.NewLine);
+        System.IO.File.AppendAllText(logPath, $"[DEBUG] Request: {System.Text.Json.JsonSerializer.Serialize(request)}" + Environment.NewLine);
+        
         var command =
             new RegisterCommand(
                 request.Email,
@@ -37,6 +42,8 @@ public class AuthenticationController : ControllerBase
         var result = await _sender.Send(
             command,
             cancellationToken);
+
+        System.IO.File.AppendAllText(logPath, $"[DEBUG] Register result: {result.IsSuccess}, Value: {result.Value}, Error: {result.Error?.Message}" + Environment.NewLine);
 
         if (result.IsFailure)
         {

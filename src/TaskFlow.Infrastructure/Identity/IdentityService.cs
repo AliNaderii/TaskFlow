@@ -23,7 +23,7 @@ public sealed class IdentityService : IIdentityService
     {
         var user = new ApplicationUser
         {
-            Id = Guid.NewGuid(),
+            Id = domainUserId,
             DomainUserId = domainUserId,
             Email = email,
             UserName = email

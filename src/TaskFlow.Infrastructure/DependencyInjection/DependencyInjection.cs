@@ -17,6 +17,7 @@ using TaskFlow.Infrastructure.Identity;
 using TaskFlow.Infrastructure.Persistence;
 using TaskFlow.Infrastructure.Authentication;
 using TaskFlow.Infrastructure.Persistence.Repositories;
+using TaskFlow.Infrastructure.Services;
 using TaskFlow.Application.Abstractions.Messaging;
 using TaskFlow.Application.Abstractions.MultiTenancy;
 using TaskFlow.Infrastructure.Messaging;
@@ -115,6 +116,8 @@ public static class DependencyInjection
         services.AddScoped<IAuthorizationHandler, ProjectManagerHandler>();
 
         services.AddScoped<IDomainEventDispatcher, DomainEventDispatcher>();
+
+        services.AddScoped<IEmailService, EmailService>();
 
         // Hangfire
         services.AddHangfire(config =>

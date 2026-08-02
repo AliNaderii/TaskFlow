@@ -6,8 +6,11 @@ using Microsoft.Extensions.Configuration;
 using Microsoft.Extensions.DependencyInjection;
 using Microsoft.Extensions.DependencyInjection.Extensions;
 using Moq;
+using TaskFlow.Application.Abstractions.Authentication;
+using TaskFlow.Application.Abstractions.MultiTenancy;
 using TaskFlow.Application.Abstractions.Services;
 using TaskFlow.Infrastructure.Authentication;
+using TaskFlow.Infrastructure.MultiTenancy;
 using TaskFlow.Infrastructure.Persistence;
 
 namespace TaskFlow.IntegrationTests.Infrastructure;
@@ -30,6 +33,10 @@ public class TaskFlowWebApplicationFactory : WebApplicationFactory<TaskFlow.Api.
 
         builder.ConfigureTestServices(services =>
         {
+            // Add HttpContextAccessor for CurrentUser
+            services.AddHttpContextAccessor();
+            services.AddScoped<ICurrentUser, CurrentUser>();
+
             // Remove the existing DbContext registration
             var descriptor = services.SingleOrDefault(
                 d => d.ServiceType == typeof(DbContextOptions<ApplicationDbContext>));
@@ -65,11 +72,13 @@ public class TaskFlowWebApplicationFactory : WebApplicationFactory<TaskFlow.Api.
             services.RemoveAll<IEmailService>();
             services.AddSingleton(emailServiceMock.Object);
 
-            // Ensure the database is created
-            var sp = services.BuildServiceProvider();
-            using var scope = sp.CreateScope();
-            var db = scope.ServiceProvider.GetRequiredService<ApplicationDbContext>();
-            db.Database.EnsureCreated();
+            // Register multi-tenancy services for testing (already registered in Infrastructure DI,
+            // but explicit registration ensures they're available in test context)
+            services.AddScoped<ITenantResolver, TenantResolver>();
+            services.AddScoped<ITenantContextInitializer, TenantContextInitializer>();
+            services.AddScoped<CurrentTenant>();
+            services.AddScoped<ICurrentTenant>(
+                provider => provider.GetRequiredService<CurrentTenant>());
         });
     }
 }

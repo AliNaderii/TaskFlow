@@ -2,30 +2,70 @@ using System.Net.Http.Json;
 using FluentAssertions;
 using TaskFlow.IntegrationTests.Infrastructure;
 using Xunit;
+using Xunit.Abstractions;
 
 namespace TaskFlow.IntegrationTests.Auth;
 
 public class AuthenticationTests : IntegrationTestBase
 {
-    public AuthenticationTests(TaskFlowWebApplicationFactory factory) : base(factory)
+    private readonly ITestOutputHelper _output;
+
+    public AuthenticationTests(TaskFlowWebApplicationFactory factory, ITestOutputHelper output) : base(factory)
     {
+        _output = output;
     }
 
     [Fact]
     public async Task Register_ValidData_ReturnsUserId()
     {
         // Act
-        var response = await Client.PostAsJsonAsync("/api/authentication/register", new
+        var request = new
         {
             Email = "newuser@example.com",
             Password = "Test123!",
             DisplayName = "New User"
-        }, TestContext.Current.CancellationToken);
+        };
+        
+        // Check if ANY routes exist - test a few different ones
+        var routesToTest = new[] 
+        { 
+            "/", 
+            "/swagger", 
+            "/swagger/v1/swagger.json",
+            "/api/authentication",
+            "/api/authentication/register",
+            "/api/authentication/login",
+            "/api/authentication/refresh-token",
+            "/api/organizations",
+            "/api/projects"
+        };
+        
+        foreach (var route in routesToTest)
+        {
+            var r = await Client.GetAsync(route);
+            var c = await r.Content.ReadAsStringAsync();
+            _output.WriteLine($"=== ROUTE {route} ===");
+            _output.WriteLine($"Status Code: {r.StatusCode} ({(int)r.StatusCode})");
+            _output.WriteLine($"Content: {c}");
+            _output.WriteLine($"============================");
+        }
+        
+        var response = await Client.PostAsJsonAsync("/api/authentication/register", request);
+
+        // Debug: output status code and content
+        var content = await response.Content.ReadAsStringAsync();
+        var statusCode = response.StatusCode;
+        
+        _output.WriteLine($"=== REGISTER TEST DEBUG ===");
+        _output.WriteLine($"Status Code: {statusCode} ({(int)statusCode})");
+        _output.WriteLine($"Content: {content}");
+        _output.WriteLine($"Request: {System.Text.Json.JsonSerializer.Serialize(request)}");
+        _output.WriteLine($"============================");
 
         // Assert
-        response.IsSuccessStatusCode.Should().BeTrue();
+        response.IsSuccessStatusCode.Should().BeTrue($"Status: {(int)statusCode}, Content: {content}");
         
-        var result = await response.Content.ReadFromJsonAsync<RegisterResponse>(cancellationToken: TestContext.Current.CancellationToken);
+        var result = System.Text.Json.JsonSerializer.Deserialize<RegisterResponse>(content, new System.Text.Json.JsonSerializerOptions { PropertyNameCaseInsensitive = true });
         result.Should().NotBeNull();
         result!.Id.Should().NotBeEmpty();
     }
@@ -42,7 +82,7 @@ public class AuthenticationTests : IntegrationTestBase
             Email = "duplicate@example.com",
             Password = "Test123!",
             DisplayName = "Another User"
-        }, TestContext.Current.CancellationToken);
+        });
 
         // Assert - returns BadRequest (400) with validation error, not Conflict (409)
         response.StatusCode.Should().Be(System.Net.HttpStatusCode.BadRequest);
@@ -61,12 +101,12 @@ public class AuthenticationTests : IntegrationTestBase
         {
             Email = "login@example.com",
             Password = "Test123!"
-        }, TestContext.Current.CancellationToken);
+        });
 
         // Assert
         response.IsSuccessStatusCode.Should().BeTrue();
         
-        var result = await response.Content.ReadFromJsonAsync<LoginResponse>(cancellationToken: TestContext.Current.CancellationToken);
+        var result = await response.Content.ReadFromJsonAsync<LoginResponse>();
         result.Should().NotBeNull();
         result!.UserId.Should().NotBeEmpty();
         result.Token.Should().NotBeNullOrEmpty();
@@ -85,7 +125,7 @@ public class AuthenticationTests : IntegrationTestBase
         {
             Email = "wrongpass@example.com",
             Password = "WrongPassword123!"
-        }, TestContext.Current.CancellationToken);
+        });
 
         // Assert - returns BadRequest (400) with error, not Unauthorized (401)
         response.StatusCode.Should().Be(System.Net.HttpStatusCode.BadRequest);
@@ -100,8 +140,8 @@ public class AuthenticationTests : IntegrationTestBase
         {
             Email = "refresh@example.com",
             Password = "Test123!"
-        }, TestContext.Current.CancellationToken);
-        var loginResult = await loginResponse.Content.ReadFromJsonAsync<LoginResponse>(cancellationToken: TestContext.Current.CancellationToken);
+        });
+        var loginResult = await loginResponse.Content.ReadFromJsonAsync<LoginResponse>();
         var refreshToken = loginResult!.NewRefreshToken!;
 
         // Act
@@ -109,12 +149,12 @@ public class AuthenticationTests : IntegrationTestBase
         var response = await Client.PostAsJsonAsync("/api/authentication/refresh-token", new
         {
             RefreshToken = refreshToken
-        }, TestContext.Current.CancellationToken);
+        });
 
         // Assert
         response.IsSuccessStatusCode.Should().BeTrue();
         
-        var result = await response.Content.ReadFromJsonAsync<LoginResponse>(cancellationToken: TestContext.Current.CancellationToken);
+        var result = await response.Content.ReadFromJsonAsync<LoginResponse>();
         result.Should().NotBeNull();
         result!.UserId.Should().NotBeEmpty();
         result.Token.Should().NotBeNullOrEmpty();
@@ -129,7 +169,7 @@ public class AuthenticationTests : IntegrationTestBase
         var response = await Client.PostAsJsonAsync("/api/authentication/refresh-token", new
         {
             RefreshToken = "invalid-token"
-        }, TestContext.Current.CancellationToken);
+        });
 
         // Assert - returns BadRequest (400) with error, not Unauthorized (401)
         response.StatusCode.Should().Be(System.Net.HttpStatusCode.BadRequest);
