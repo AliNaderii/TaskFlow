@@ -1,4 +1,4 @@
-using MediatR;
+using Microsoft.Extensions.DependencyInjection;
 using TaskFlow.Application.Abstractions.Messaging;
 using TaskFlow.Domain.Common;
 
@@ -6,18 +6,32 @@ namespace TaskFlow.Infrastructure.Messaging;
 
 internal sealed class DomainEventDispatcher : IDomainEventDispatcher
 {
-    private readonly IPublisher _publisher;
+    private readonly IServiceProvider _serviceProvider;
 
-    public DomainEventDispatcher(IPublisher publisher)
+    public DomainEventDispatcher(IServiceProvider serviceProvider)
     {
-        _publisher = publisher;
+        _serviceProvider = serviceProvider;
     }
 
     public async Task DispatchAsync(IEnumerable<IDomainEvent> domainEvents, CancellationToken cancellationToken = default)
     {
         foreach (var domainEvent in domainEvents)
         {
-            await _publisher.Publish(domainEvent, cancellationToken);
+            var handlerType = typeof(IDomainEventHandler<>).MakeGenericType(domainEvent.GetType());
+            var handler = _serviceProvider.GetService(handlerType);
+
+            if (handler is null)
+            {
+                continue;
+            }
+
+            var handleMethod = handlerType.GetMethod(nameof(IDomainEventHandler<IDomainEvent>.Handle));
+            if (handleMethod is null)
+            {
+                continue;
+            }
+
+            await (Task)handleMethod.Invoke(handler, [domainEvent, cancellationToken])!;
         }
     }
 }

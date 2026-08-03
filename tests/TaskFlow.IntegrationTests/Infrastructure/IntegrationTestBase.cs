@@ -15,7 +15,10 @@ public abstract class IntegrationTestBase : IClassFixture<TaskFlowWebApplication
     protected IntegrationTestBase(TaskFlowWebApplicationFactory factory)
     {
         Factory = factory;
-        Client = factory.CreateClient();
+        Client = factory.CreateClient(new WebApplicationFactoryClientOptions
+        {
+            BaseAddress = new Uri("https://localhost")
+        });
     }
 
     protected TService GetService<TService>() where TService : notnull

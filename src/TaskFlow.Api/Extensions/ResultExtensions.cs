@@ -5,8 +5,21 @@ namespace TaskFlow.Api.Extensions;
 
 public static class ResultExtensions
 {   
-    public static IActionResult ToProblemDetails(this Error error)
+    public static IActionResult ToProblemDetails(this Error? error)
     {
+        if (error is null)
+        {
+            return new ObjectResult(new ProblemDetails
+            {
+                Status = StatusCodes.Status400BadRequest,
+                Title = "Validation error.",
+                Detail = "An unknown error occurred."
+            })
+            {
+                StatusCode = StatusCodes.Status400BadRequest
+            };
+        }
+
         var statusCode = GetStatusCode(error.Code);
 
         var problemDetails = new ProblemDetails

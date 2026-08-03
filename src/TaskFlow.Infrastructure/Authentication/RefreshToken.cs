@@ -1,6 +1,8 @@
 namespace TaskFlow.Infrastructure.Authentication;
 
-public sealed class RefreshToken
+using TaskFlow.Domain.Common;
+
+public sealed class RefreshToken : ITenantEntity
 {
     private RefreshToken()
     {
@@ -13,6 +15,7 @@ public sealed class RefreshToken
     public DateTime ExpiresAt { get; private set; }
     public DateTime CreatedAt { get; private set; }
     public DateTime? RevokedAt { get; private set; }
+    public Guid OrganizationId { get; private set; }
     public bool IsExpired => DateTime.UtcNow >= ExpiresAt;
     public bool IsRevoked => RevokedAt.HasValue;
     public bool IsActive => !IsExpired && !IsRevoked;
@@ -21,7 +24,8 @@ public sealed class RefreshToken
         Guid userId,
         string email,
         string token,
-        int expirationDays)
+        int expirationDays,
+        Guid organizationId)
     {
         return new RefreshToken
         {
@@ -29,6 +33,7 @@ public sealed class RefreshToken
             UserId = userId,
             Email = email,
             Token = token,
+            OrganizationId = organizationId,
             CreatedAt = DateTime.UtcNow,
             ExpiresAt = DateTime.UtcNow.AddDays(expirationDays)
         };

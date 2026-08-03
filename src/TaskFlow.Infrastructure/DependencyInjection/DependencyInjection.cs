@@ -1,4 +1,5 @@
 using System.Text;
+using Microsoft.AspNetCore.Authentication;
 using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Identity;
 using Microsoft.EntityFrameworkCore;
@@ -24,6 +25,8 @@ using TaskFlow.Infrastructure.Messaging;
 using TaskFlow.Infrastructure.MultiTenancy;
 using TaskFlow.Infrastructure.Authorization;
 using TaskFlow.Infrastructure.BackgroundJobs;
+using TaskFlow.Application.Events.Handlers;
+using TaskFlow.Domain.Events;
 
 namespace TaskFlow.Infrastructure.DependencyInjection;
 
@@ -61,6 +64,25 @@ public static class DependencyInjection
             })
             .AddJwtBearer(options =>
             {
+                options.Events = new JwtBearerEvents
+                {
+                    OnMessageReceived = context =>
+                    {
+                        Console.WriteLine($"[DEBUG] JWT OnMessageReceived token present: {context.Token is not null}");
+                        return Task.CompletedTask;
+                    },
+                    OnTokenValidated = context =>
+                    {
+                        Console.WriteLine($"[DEBUG] JWT OnTokenValidated: IsAuthenticated={context.Principal?.Identity?.IsAuthenticated}");
+                        return Task.CompletedTask;
+                    },
+                    OnAuthenticationFailed = context =>
+                    {
+                        Console.WriteLine($"[DEBUG] JWT OnAuthenticationFailed: {context.Exception}");
+                        return Task.CompletedTask;
+                    }
+                };
+
                 options.TokenValidationParameters =
                     new TokenValidationParameters
                 {
@@ -92,13 +114,20 @@ public static class DependencyInjection
             provider => provider.GetRequiredService<ApplicationDbContext>());
 
         services
-            .AddIdentity<ApplicationUser, IdentityRole<Guid>>(
-                options =>
-                {
-                    options.User.RequireUniqueEmail = true;
-                })
+            .AddIdentityCore<ApplicationUser>(options =>
+            {
+                options.User.RequireUniqueEmail = true;
+            })
+            .AddRoles<IdentityRole<Guid>>()
             .AddEntityFrameworkStores<ApplicationDbContext>()
             .AddDefaultTokenProviders();
+
+        services.PostConfigure<AuthenticationOptions>(options =>
+        {
+            options.DefaultScheme = JwtBearerDefaults.AuthenticationScheme;
+            options.DefaultAuthenticateScheme = JwtBearerDefaults.AuthenticationScheme;
+            options.DefaultChallengeScheme = JwtBearerDefaults.AuthenticationScheme;
+        });
 
         services.AddScoped<IIdentityService, IdentityService>();
         services.AddScoped<IRefreshTokenService, RefreshTokenService>();
@@ -114,6 +143,12 @@ public static class DependencyInjection
         services.AddScoped<IAuthorizationHandler, OrganizationMemberHandler>();
         services.AddScoped<IAuthorizationHandler, OrganizationAdminHandler>();
         services.AddScoped<IAuthorizationHandler, ProjectManagerHandler>();
+
+        services.AddScoped<IDomainEventHandler<TaskAssignedEvent>, TaskAssignedEventHandler>();
+        services.AddScoped<IDomainEventHandler<CommentCreatedEvent>, CommentCreatedEventHandler>();
+        services.AddScoped<IDomainEventHandler<MembershipAddedEvent>, MembershipAddedEventHandler>();
+        services.AddScoped<IDomainEventHandler<ProjectArchivedEvent>, ProjectArchivedEventHandler>();
+        services.AddScoped<IDomainEventHandler<TaskCompletedEvent>, TaskCompletedEventHandler>();
 
         services.AddScoped<IDomainEventDispatcher, DomainEventDispatcher>();
 

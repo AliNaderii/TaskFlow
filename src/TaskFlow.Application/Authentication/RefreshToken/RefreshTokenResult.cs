@@ -4,4 +4,5 @@ public sealed record RefreshTokenResult(
     Guid UserId,
     string Email,
     string Token,
-    DateTime ExpiresAt);
+    DateTime ExpiresAt,
+    Guid OrganizationId);

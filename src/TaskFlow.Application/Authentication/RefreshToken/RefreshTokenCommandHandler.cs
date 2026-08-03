@@ -3,6 +3,7 @@ using TaskFlow.Domain.Errors;
 using TaskFlow.Application.Authentication.Login;
 using TaskFlow.Application.Abstractions.Messaging;
 using TaskFlow.Application.Abstractions.Authentication;
+using TaskFlow.Application.Abstractions.MultiTenancy;
 
 namespace TaskFlow.Application.Authentication.RefreshToken;
 
@@ -11,13 +12,16 @@ public sealed class RefreshTokenCommandHandler
 {
     private readonly IRefreshTokenService _refreshTokenService;
     private readonly IJwtTokenProvider _jwtTokenProvider;
+    private readonly ICurrentTenant _currentTenant;
 
     public RefreshTokenCommandHandler(
         IRefreshTokenService refreshTokenService,
-        IJwtTokenProvider jwtTokenProvider)
+        IJwtTokenProvider jwtTokenProvider,
+        ICurrentTenant currentTenant)
     {
         _refreshTokenService = refreshTokenService;
         _jwtTokenProvider = jwtTokenProvider;
+        _currentTenant = currentTenant;
     }
 
     public async Task<Result<LoginResponse>> Handle(
@@ -42,17 +46,19 @@ public sealed class RefreshTokenCommandHandler
             request.RefreshToken,
             cancellationToken);
 
-
         var accessToken = _jwtTokenProvider.GenerateToken(
             storedToken.UserId,
             storedToken.Email);
 
+        var organizationId = storedToken.OrganizationId == Guid.Empty
+            ? _currentTenant.OrganizationId ?? Guid.Empty
+            : storedToken.OrganizationId;
 
         var newRefreshToken = await _refreshTokenService.CreateAsync(
             storedToken.UserId,
             storedToken.Email,
+            organizationId,
             cancellationToken);
-
 
         return Result<LoginResponse>.Success(
             new LoginResponse(

@@ -1,5 +1,6 @@
 using TaskFlow.Application.Abstractions.Authentication;
 using TaskFlow.Application.Abstractions.Messaging;
+using TaskFlow.Application.Abstractions.MultiTenancy;
 using TaskFlow.Application.Abstractions.Services;
 using TaskFlow.Domain.Common;
 using TaskFlow.Domain.Errors;
@@ -12,15 +13,18 @@ public sealed class LoginCommandHandler
     private readonly IIdentityService _identityService;
     private readonly IJwtTokenProvider _jwtTokenProvider;
     private readonly IRefreshTokenService _refreshTokenService;
+    private readonly ICurrentTenant _currentTenant;
 
     public LoginCommandHandler(
         IIdentityService identityService,
         IJwtTokenProvider jwtTokenProvider,
-        IRefreshTokenService refreshTokenService)
+        IRefreshTokenService refreshTokenService,
+        ICurrentTenant currentTenant)
     {
         _identityService = identityService;
         _jwtTokenProvider = jwtTokenProvider;
         _refreshTokenService = refreshTokenService;
+        _currentTenant = currentTenant;
     }
 
     public async Task<Result<LoginResponse>> Handle(
@@ -38,17 +42,20 @@ public sealed class LoginCommandHandler
         }
 
         var token = _jwtTokenProvider.GenerateToken(
-            userId.Value, 
+            userId.Value,
             request.Email);
+
+        var organizationId = _currentTenant.OrganizationId ?? Guid.Empty;
 
         var refreshTokenResult = await _refreshTokenService.CreateAsync(
             userId.Value,
             request.Email,
+            organizationId,
             cancellationToken);
 
         return Result<LoginResponse>.Success(
             new LoginResponse(
-                userId.Value, 
+                userId.Value,
                 token,
                 refreshTokenResult.Token));
     }

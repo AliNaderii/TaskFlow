@@ -1,4 +1,6 @@
 using Hangfire;
+using Microsoft.AspNetCore.Authentication.JwtBearer;
+using Microsoft.AspNetCore.Authorization;
 using TaskFlow.Application.Abstractions.BackgroundJobs;
 using TaskFlow.Application.DependencyInjection;
 using TaskFlow.Infrastructure.DependencyInjection;
@@ -22,13 +24,19 @@ namespace TaskFlow.Api
             builder.Services.AddInfrastructure(builder.Configuration);
             builder.Services.AddApplication();
 
-            builder.Services.AddAuthorizationBuilder()
-                .AddPolicy("OrganizationMember", policy =>
-                    policy.Requirements.Add(new OrganizationMemberRequirement()))
-                .AddPolicy("OrganizationAdmin", policy =>
-                    policy.Requirements.Add(new OrganizationAdminRequirement()))
-                .AddPolicy("ProjectManager", policy =>
+            builder.Services.AddAuthorization(options =>
+            {
+                options.DefaultPolicy = new AuthorizationPolicyBuilder(JwtBearerDefaults.AuthenticationScheme)
+                    .RequireAuthenticatedUser()
+                    .Build();
+
+                options.AddPolicy("OrganizationMember", policy =>
+                    policy.Requirements.Add(new OrganizationMemberRequirement()));
+                options.AddPolicy("OrganizationAdmin", policy =>
+                    policy.Requirements.Add(new OrganizationAdminRequirement()));
+                options.AddPolicy("ProjectManager", policy =>
                     policy.Requirements.Add(new ProjectManagerRequirement()));
+            });
 
             var app = builder.Build();
 

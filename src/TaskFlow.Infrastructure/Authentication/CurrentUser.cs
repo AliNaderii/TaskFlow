@@ -20,8 +20,14 @@ public sealed class CurrentUser : ICurrentUser
     {
         get
         {
-            var userId = _httpContextAccessor.HttpContext?.User
-                .FindFirstValue(JwtRegisteredClaimNames.Sub);
+            var principal = _httpContextAccessor.HttpContext?.User;
+            if (principal is null)
+            {
+                return null;
+            }
+
+            var userId = principal.FindFirstValue(JwtRegisteredClaimNames.Sub)
+                ?? principal.FindFirstValue(ClaimTypes.NameIdentifier);
 
             return Guid.TryParse(userId, out var id) ? id : null;
         }

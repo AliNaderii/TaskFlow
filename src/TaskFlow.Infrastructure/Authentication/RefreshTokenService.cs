@@ -4,6 +4,7 @@ using Microsoft.Extensions.Options;
 using TaskFlow.Infrastructure.Persistence;
 using TaskFlow.Application.Abstractions.Authentication;
 using TaskFlow.Application.Authentication.RefreshToken;
+using TaskFlow.Application.Abstractions.MultiTenancy;
 
 namespace TaskFlow.Infrastructure.Authentication;
 
@@ -11,20 +12,22 @@ public sealed class RefreshTokenService : IRefreshTokenService
 {
     private readonly ApplicationDbContext _context;
     private readonly JwtOptions _options;
-
+    private readonly ICurrentTenant _currentTenant;
 
     public RefreshTokenService(
         ApplicationDbContext context,
-        IOptions<JwtOptions> options)
+        IOptions<JwtOptions> options,
+        ICurrentTenant currentTenant)
     {
         _context = context;
         _options = options.Value;
+        _currentTenant = currentTenant;
     }
-
 
     public async Task<RefreshTokenResult> CreateAsync(
         Guid userId,
         string email,
+        Guid organizationId,
         CancellationToken cancellationToken = default)
     {
         var token = Convert.ToBase64String(RandomNumberGenerator.GetBytes(64));
@@ -33,7 +36,8 @@ public sealed class RefreshTokenService : IRefreshTokenService
             userId,
             email,
             token,
-            _options.RefreshTokenExpirationDays);
+            _options.RefreshTokenExpirationDays,
+            organizationId);
 
         _context.RefreshTokens.Add(refreshToken);
 
@@ -43,9 +47,9 @@ public sealed class RefreshTokenService : IRefreshTokenService
             refreshToken.UserId,
             refreshToken.Email,
             refreshToken.Token,
-            refreshToken.ExpiresAt);
+            refreshToken.ExpiresAt,
+            refreshToken.OrganizationId);
     }
-
 
     public async Task<RefreshTokenResult?> GetAsync(
         string token,
@@ -55,13 +59,13 @@ public sealed class RefreshTokenService : IRefreshTokenService
             .FirstOrDefaultAsync(
                 x => x.Token == token,
                 cancellationToken);
-        
+
         if (refreshToken is null)
         {
             return null;
         }
 
-         if (!refreshToken.IsActive)
+        if (!refreshToken.IsActive)
         {
             return null;
         }
@@ -70,7 +74,8 @@ public sealed class RefreshTokenService : IRefreshTokenService
             refreshToken.UserId,
             refreshToken.Email,
             refreshToken.Token,
-            refreshToken.ExpiresAt);
+            refreshToken.ExpiresAt,
+            refreshToken.OrganizationId);
     }
 
     public async Task<bool> RevokeAsync(

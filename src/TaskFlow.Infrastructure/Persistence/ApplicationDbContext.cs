@@ -51,7 +51,9 @@ public class ApplicationDbContext
     {
         foreach (var entityType in modelBuilder.Model
             .GetEntityTypes()
-            .Where(x => typeof(ITenantEntity).IsAssignableFrom(x.ClrType)))
+            .Where(x => typeof(ITenantEntity).IsAssignableFrom(x.ClrType) &&
+                       x.ClrType.Name != nameof(User) &&
+                       x.ClrType.Name != nameof(Organization)))
         {
             var method = typeof(ApplicationDbContext)
                 .GetMethod(
@@ -69,7 +71,8 @@ public class ApplicationDbContext
     {
         modelBuilder.Entity<T>()
             .HasQueryFilter(
-            entity => entity.OrganizationId == _currentTenant.OrganizationId);
+                entity => _currentTenant.OrganizationId == null
+                    || entity.OrganizationId == _currentTenant.OrganizationId);
     }
 
     public override async Task<int> SaveChangesAsync(

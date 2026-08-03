@@ -1,4 +1,5 @@
 using MediatR;
+using Microsoft.AspNetCore.Authentication.JwtBearer;
 using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;
 using TaskFlow.Api.Contracts.Notifications;
@@ -10,7 +11,7 @@ using ApiNotificationResponse = TaskFlow.Api.Contracts.Notifications.Notificatio
 
 namespace TaskFlow.Api.Controllers;
 
-[Authorize]
+[Authorize(AuthenticationSchemes = JwtBearerDefaults.AuthenticationScheme)]
 [ApiController]
 [Route("api/[controller]")]
 public sealed class NotificationsController : ControllerBase

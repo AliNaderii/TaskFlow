@@ -145,7 +145,7 @@ public class Membership : AuditableEntity, ITenantEntity
             return BaseResult.Failure(MembershipErrors.OnlyOwnerCanTransferOwnership);
         }
 
-        if (targetMembership == null)
+        if (targetMembership is null)
         {
             return BaseResult.Failure(MembershipErrors.TargetMemberNotFound);
         }

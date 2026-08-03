@@ -139,11 +139,11 @@ public sealed class TaskItem : AuditableEntity, ITenantEntity
         AssigneeUserId = userId;
         
         AddDomainEvent(TaskAssignedEvent.Create(Id, userId, assignedByUserId));
-    
+
         return BaseResult.Success();
     }
-    
-        public BaseResult Unassign()
+
+    public BaseResult Unassign()
     {
         if (IsArchived)
         {

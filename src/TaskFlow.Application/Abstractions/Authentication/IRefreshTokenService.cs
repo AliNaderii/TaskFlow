@@ -7,6 +7,7 @@ public interface IRefreshTokenService
     Task<RefreshTokenResult> CreateAsync(
         Guid userId,
         string email,
+        Guid organizationId,
         CancellationToken cancellationToken = default);
 
 

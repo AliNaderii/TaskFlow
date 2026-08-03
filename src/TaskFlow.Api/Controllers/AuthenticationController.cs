@@ -29,10 +29,6 @@ public class AuthenticationController : ControllerBase
         ApiRegisterRequest request,
         CancellationToken cancellationToken)
     {
-        var logPath = System.IO.Path.Combine(System.IO.Path.GetTempPath(), "taskflow_auth_debug.log");
-        System.IO.File.AppendAllText(logPath, $"[DEBUG] AuthenticationController.Register called" + Environment.NewLine);
-        System.IO.File.AppendAllText(logPath, $"[DEBUG] Request: {System.Text.Json.JsonSerializer.Serialize(request)}" + Environment.NewLine);
-        
         var command =
             new RegisterCommand(
                 request.Email,
@@ -42,8 +38,6 @@ public class AuthenticationController : ControllerBase
         var result = await _sender.Send(
             command,
             cancellationToken);
-
-        System.IO.File.AppendAllText(logPath, $"[DEBUG] Register result: {result.IsSuccess}, Value: {result.Value}, Error: {result.Error?.Message}" + Environment.NewLine);
 
         if (result.IsFailure)
         {

@@ -1,13 +1,12 @@
-using MediatR;
+using TaskFlow.Application.Abstractions.Messaging;
 using TaskFlow.Application.Abstractions.Persistence;
-using TaskFlow.Domain.Events;
 using TaskFlow.Domain.Entities;
 using TaskFlow.Domain.Enums;
-using TaskFlow.Domain.Errors;
+using TaskFlow.Domain.Events;
 
 namespace TaskFlow.Application.Events.Handlers;
 
-internal sealed class TaskAssignedEventHandler : INotificationHandler<TaskAssignedEvent>
+public sealed class TaskAssignedEventHandler : IDomainEventHandler<TaskAssignedEvent>
 {
     private readonly INotificationRepository _notificationRepository;
     private readonly IUnitOfWork _unitOfWork;

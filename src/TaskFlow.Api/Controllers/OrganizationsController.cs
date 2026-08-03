@@ -1,4 +1,5 @@
 using MediatR;
+using Microsoft.AspNetCore.Authentication.JwtBearer;
 using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;
 using TaskFlow.Api.Contracts.Organizations;
@@ -22,7 +23,7 @@ using TaskFlow.Application.Organizations.Queries.Invitations.GetInvitationByToke
 using TaskFlow.Application.Organizations.Queries.Invitations.GetOrganizationInvitations;
 namespace TaskFlow.Api.Controllers;
 
-[Authorize]
+[Authorize(AuthenticationSchemes = JwtBearerDefaults.AuthenticationScheme)]
 [ApiController]
 [Route("api/[controller]")]
 public class OrganizationsController : ControllerBase
