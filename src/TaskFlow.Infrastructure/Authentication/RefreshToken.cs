@@ -16,6 +16,7 @@ public sealed class RefreshToken : ITenantEntity
     public DateTime CreatedAt { get; private set; }
     public DateTime? RevokedAt { get; private set; }
     public Guid OrganizationId { get; private set; }
+    public Guid FamilyId { get; private set; }
     public bool IsExpired => DateTime.UtcNow >= ExpiresAt;
     public bool IsRevoked => RevokedAt.HasValue;
     public bool IsActive => !IsExpired && !IsRevoked;
@@ -25,7 +26,8 @@ public sealed class RefreshToken : ITenantEntity
         string email,
         string token,
         int expirationDays,
-        Guid organizationId)
+        Guid organizationId,
+        Guid? familyId = null)
     {
         return new RefreshToken
         {
@@ -34,6 +36,25 @@ public sealed class RefreshToken : ITenantEntity
             Email = email,
             Token = token,
             OrganizationId = organizationId,
+            FamilyId = familyId ?? Guid.NewGuid(),
+            CreatedAt = DateTime.UtcNow,
+            ExpiresAt = DateTime.UtcNow.AddDays(expirationDays)
+        };
+    }
+
+    public static RefreshToken CreateNextInFamily(
+        RefreshToken currentToken,
+        string newToken,
+        int expirationDays)
+    {
+        return new RefreshToken
+        {
+            Id = Guid.NewGuid(),
+            UserId = currentToken.UserId,
+            Email = currentToken.Email,
+            Token = newToken,
+            OrganizationId = currentToken.OrganizationId,
+            FamilyId = currentToken.FamilyId,
             CreatedAt = DateTime.UtcNow,
             ExpiresAt = DateTime.UtcNow.AddDays(expirationDays)
         };

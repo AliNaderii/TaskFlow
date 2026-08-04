@@ -17,6 +17,7 @@ public class ApplicationDbContext
 {
     private readonly ICurrentTenant _currentTenant;
     private readonly IDomainEventDispatcher _domainEventDispatcher;
+    private bool _isDispatchingEvents = false;
     
     public ApplicationDbContext(
         DbContextOptions<ApplicationDbContext> options,
@@ -78,6 +79,13 @@ public class ApplicationDbContext
     public override async Task<int> SaveChangesAsync(
         CancellationToken cancellationToken = default)
     {
+        // Prevent re-entrant calls from dispatching events again
+        // This handles the case where a domain event handler calls SaveChangesAsync
+        if (_isDispatchingEvents)
+        {
+            return await base.SaveChangesAsync(cancellationToken);
+        }
+
         var domainEntities = ChangeTracker
             .Entries<AuditableEntity>()
             .Where(x => x.Entity.DomainEvents.Any())
@@ -87,13 +95,23 @@ public class ApplicationDbContext
             .SelectMany(x => x.Entity.DomainEvents)
             .ToList();
 
+        // Clear domain events BEFORE saving to prevent infinite loops
+        domainEntities.ForEach(e => e.Entity.ClearDomainEvents());
+
         var result = await base.SaveChangesAsync(cancellationToken);
 
+        // Dispatch events AFTER successful save
         if (domainEvents.Any())
         {
-            await _domainEventDispatcher.DispatchAsync(domainEvents, cancellationToken);
-
-            domainEntities.ForEach(e => e.Entity.ClearDomainEvents());
+            _isDispatchingEvents = true;
+            try
+            {
+                await _domainEventDispatcher.DispatchAsync(domainEvents.AsReadOnly(), cancellationToken);
+            }
+            finally
+            {
+                _isDispatchingEvents = false;
+            }
         }
 
         return result;

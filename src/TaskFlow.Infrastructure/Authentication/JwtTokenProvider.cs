@@ -31,7 +31,10 @@ public sealed class JwtTokenProvider : IJwtTokenProvider
         };
 
         var key = new SymmetricSecurityKey(
-            Encoding.UTF8.GetBytes(_options.SecretKey));
+            Encoding.UTF8.GetBytes(_options.SecretKey))
+        {
+            KeyId = "TaskFlow"
+        };
 
 
         var credentials =

@@ -5,6 +5,6 @@ namespace TaskFlow.Application.Abstractions.Messaging;
 public interface IDomainEventDispatcher
 {
     Task DispatchAsync(
-        IEnumerable<IDomainEvent> domainEvents, 
+        IReadOnlyCollection<IDomainEvent> domainEvents, 
         CancellationToken cancellationToken = default);
 }

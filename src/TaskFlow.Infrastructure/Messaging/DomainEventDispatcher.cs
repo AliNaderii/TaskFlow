@@ -13,7 +13,7 @@ internal sealed class DomainEventDispatcher : IDomainEventDispatcher
         _serviceProvider = serviceProvider;
     }
 
-    public async Task DispatchAsync(IEnumerable<IDomainEvent> domainEvents, CancellationToken cancellationToken = default)
+    public async Task DispatchAsync(IReadOnlyCollection<IDomainEvent> domainEvents, CancellationToken cancellationToken = default)
     {
         foreach (var domainEvent in domainEvents)
         {

@@ -48,7 +48,9 @@ public sealed class RefreshTokenService : IRefreshTokenService
             refreshToken.Email,
             refreshToken.Token,
             refreshToken.ExpiresAt,
-            refreshToken.OrganizationId);
+            refreshToken.OrganizationId,
+            refreshToken.FamilyId,
+            refreshToken.IsRevoked);
     }
 
     public async Task<RefreshTokenResult?> GetAsync(
@@ -75,7 +77,9 @@ public sealed class RefreshTokenService : IRefreshTokenService
             refreshToken.Email,
             refreshToken.Token,
             refreshToken.ExpiresAt,
-            refreshToken.OrganizationId);
+            refreshToken.OrganizationId,
+            refreshToken.FamilyId,
+            refreshToken.IsRevoked);
     }
 
     public async Task<bool> RevokeAsync(
@@ -98,6 +102,56 @@ public sealed class RefreshTokenService : IRefreshTokenService
         }
 
         refreshToken.Revoke();
+
+        await _context.SaveChangesAsync(cancellationToken);
+
+        return true;
+    }
+
+    public async Task<RefreshTokenResult> CreateNextInFamilyAsync(
+        Guid userId,
+        string email,
+        Guid familyId,
+        Guid organizationId,
+        int expirationDays,
+        CancellationToken cancellationToken = default)
+    {
+        var token = Convert.ToBase64String(RandomNumberGenerator.GetBytes(64));
+
+        var refreshToken = RefreshToken.Create(
+            userId,
+            email,
+            token,
+            expirationDays,
+            organizationId,
+            familyId);
+
+        _context.RefreshTokens.Add(refreshToken);
+
+        await _context.SaveChangesAsync(cancellationToken);
+
+        return new RefreshTokenResult(
+            refreshToken.UserId,
+            refreshToken.Email,
+            refreshToken.Token,
+            refreshToken.ExpiresAt,
+            refreshToken.OrganizationId,
+            refreshToken.FamilyId,
+            refreshToken.IsRevoked);
+    }
+
+    public async Task<bool> RevokeFamilyAsync(
+        Guid familyId,
+        CancellationToken cancellationToken = default)
+    {
+        var familyTokens = await _context.RefreshTokens
+            .Where(x => x.FamilyId == familyId && x.IsActive)
+            .ToListAsync(cancellationToken);
+
+        foreach (var token in familyTokens)
+        {
+            token.Revoke();
+        }
 
         await _context.SaveChangesAsync(cancellationToken);
 

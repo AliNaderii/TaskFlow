@@ -1,12 +1,12 @@
 using MediatR;
 using Microsoft.AspNetCore.Mvc;
-using System.IO;
 using TaskFlow.Api.Extensions;
 using TaskFlow.Api.Contracts.Authentication;
 using TaskFlow.Application.Authentication.Login;
+using TaskFlow.Application.Authentication.Logout;
 using TaskFlow.Application.Authentication.Register;
-using TaskFlow.Api.Authentication;
 using TaskFlow.Application.Authentication.RefreshToken;
+using TaskFlow.Api.Authentication;
 using Microsoft.AspNetCore.Authorization;
 
 namespace TaskFlow.Api.Controllers;
@@ -87,5 +87,22 @@ public class AuthenticationController : ControllerBase
         }
 
         return Ok(result.Value);
+    }
+
+    [HttpPost("logout")]
+    public async Task<IActionResult> Logout(
+        RefreshTokenRequest request,
+        CancellationToken cancellationToken)
+    {
+        var command = new LogoutCommand(request.RefreshToken);
+
+        var result = await _sender.Send(command, cancellationToken);
+
+        if (result.IsFailure)
+        {
+            return result.Error.ToProblemDetails();
+        }
+
+        return NoContent();
     }
 }

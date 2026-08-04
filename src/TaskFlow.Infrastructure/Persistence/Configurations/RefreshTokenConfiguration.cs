@@ -20,8 +20,18 @@ public sealed class RefreshTokenConfiguration
             .HasMaxLength(500)
             .IsRequired();
 
+        builder.Property(x => x.OrganizationId)
+            .IsRequired();
+
         builder.HasIndex(x => x.Token)
             .IsUnique();
+
+        builder.HasIndex(x => x.OrganizationId);
+
+        builder.Property(x => x.FamilyId)
+            .IsRequired();
+
+        builder.HasIndex(x => x.FamilyId);
 
         builder.Property(x => x.CreatedAt)
             .IsRequired();

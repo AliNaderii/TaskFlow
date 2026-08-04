@@ -5,6 +5,7 @@ using Microsoft.AspNetCore.Mvc;
 using TaskFlow.Api.Contracts.Projects;
 using TaskFlow.Api.Extensions;
 using TaskFlow.Application.Projects.Commands.ArchiveProject;
+using TaskFlow.Application.Projects.Commands.CreateProject;
 using TaskFlow.Application.Projects.Commands.UpdateProject;
 using TaskFlow.Application.Projects.Queries.GetProjectById;
 using TaskFlow.Application.Projects.Queries.SearchProjects;
@@ -108,5 +109,25 @@ public class ProjectsController : ControllerBase
         }
 
         return NoContent();
+    }
+
+    [HttpPost]
+    [Authorize(Policy = "OrganizationMember")]
+    public async Task<IActionResult> Create(
+        CreateProjectRequest request,
+        CancellationToken cancellationToken)
+    {
+        var command = new CreateProjectCommand(
+            request.Name,
+            request.Description);
+
+        var result = await _sender.Send(command, cancellationToken);
+
+        if (result.IsFailure)
+        {
+            return result.Error.ToProblemDetails();
+        }
+
+        return CreatedAtAction(nameof(GetById), new { id = result.Value }, new { id = result.Value });
     }
 }

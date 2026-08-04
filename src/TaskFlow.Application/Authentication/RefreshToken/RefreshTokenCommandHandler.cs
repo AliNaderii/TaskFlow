@@ -12,16 +12,17 @@ public sealed class RefreshTokenCommandHandler
 {
     private readonly IRefreshTokenService _refreshTokenService;
     private readonly IJwtTokenProvider _jwtTokenProvider;
-    private readonly ICurrentTenant _currentTenant;
+    private readonly ITenantResolver _tenantResolver;
+    private const int RefreshTokenExpirationDays = 7;
 
     public RefreshTokenCommandHandler(
         IRefreshTokenService refreshTokenService,
         IJwtTokenProvider jwtTokenProvider,
-        ICurrentTenant currentTenant)
+        ITenantResolver tenantResolver)
     {
         _refreshTokenService = refreshTokenService;
         _jwtTokenProvider = jwtTokenProvider;
-        _currentTenant = currentTenant;
+        _tenantResolver = tenantResolver;
     }
 
     public async Task<Result<LoginResponse>> Handle(
@@ -42,6 +43,14 @@ public sealed class RefreshTokenCommandHandler
             return Result<LoginResponse>.Failure(AuthenticationErrors.ExpiredRefreshToken);
         }
 
+        // Check for token reuse (breach detection) - if token was already revoked, revoke entire family
+        if (storedToken.IsRevoked)
+        {
+            await _refreshTokenService.RevokeFamilyAsync(storedToken.FamilyId, cancellationToken);
+            return Result<LoginResponse>.Failure(AuthenticationErrors.InvalidRefreshToken);
+        }
+
+        // Revoke the current token
         await _refreshTokenService.RevokeAsync(
             request.RefreshToken,
             cancellationToken);
@@ -50,14 +59,15 @@ public sealed class RefreshTokenCommandHandler
             storedToken.UserId,
             storedToken.Email);
 
-        var organizationId = storedToken.OrganizationId == Guid.Empty
-            ? _currentTenant.OrganizationId ?? Guid.Empty
-            : storedToken.OrganizationId;
+        var organizationId = await _tenantResolver.ResolveAsync(storedToken.UserId, cancellationToken) ?? storedToken.OrganizationId;
 
-        var newRefreshToken = await _refreshTokenService.CreateAsync(
+        // Create next token in the same family
+        var newRefreshToken = await _refreshTokenService.CreateNextInFamilyAsync(
             storedToken.UserId,
             storedToken.Email,
+            storedToken.FamilyId,
             organizationId,
+            RefreshTokenExpirationDays,
             cancellationToken);
 
         return Result<LoginResponse>.Success(

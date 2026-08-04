@@ -55,19 +55,24 @@ namespace TaskFlow.Api
             app.UseAuthentication();
             app.UseTenant();
             app.UseAuthorization();
-            
-            // Hangfire Dashboard - secured with OrganizationAdmin policy
-            app.UseHangfireDashboard("/hangfire", new DashboardOptions
+
+            // Skip Hangfire dashboard and recurring job registration in integration tests
+            // (tests use in-memory storage and do not need the SQL-backed server lifecycle).
+            if (!app.Environment.IsEnvironment("Testing"))
             {
-                Authorization = [new HangfireAuthorizationFilter("OrganizationAdmin")],
-                DashboardTitle = "TaskFlow Background Jobs"
-            });
-            
-            // Configure recurring jobs
-            using (var scope = app.Services.CreateScope())
-            {
-                var recurringJobService = scope.ServiceProvider.GetRequiredService<IRecurringJobService>();
-                recurringJobService.ConfigureRecurringJobs();
+                // Hangfire Dashboard - secured with OrganizationAdmin policy
+                app.UseHangfireDashboard("/hangfire", new DashboardOptions
+                {
+                    Authorization = [new HangfireAuthorizationFilter("OrganizationAdmin")],
+                    DashboardTitle = "TaskFlow Background Jobs"
+                });
+
+                // Configure recurring jobs
+                using (var scope = app.Services.CreateScope())
+                {
+                    var recurringJobService = scope.ServiceProvider.GetRequiredService<IRecurringJobService>();
+                    recurringJobService.ConfigureRecurringJobs();
+                }
             }
 
             app.MapControllers();

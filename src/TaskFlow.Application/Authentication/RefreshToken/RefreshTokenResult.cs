@@ -5,4 +5,6 @@ public sealed record RefreshTokenResult(
     string Email,
     string Token,
     DateTime ExpiresAt,
-    Guid OrganizationId);
+    Guid OrganizationId,
+    Guid FamilyId,
+    bool IsRevoked);

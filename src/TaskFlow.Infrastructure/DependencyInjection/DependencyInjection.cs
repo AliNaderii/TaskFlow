@@ -53,6 +53,9 @@ public static class DependencyInjection
             .Get<JwtOptions>()
                 ?? throw new InvalidOperationException("Jwt configuration is missing.");
 
+        services.Configure<EmailOptions>(
+            configuration.GetSection(EmailOptions.SectionName));
+
         services
             .AddAuthentication(options =>
             {
@@ -96,6 +99,9 @@ public static class DependencyInjection
 
                     IssuerSigningKey = new SymmetricSecurityKey(
                         Encoding.UTF8.GetBytes(jwtOptions.SecretKey))
+                    {
+                        KeyId = "TaskFlow"
+                    }
                 };
             });
             

@@ -13,18 +13,18 @@ public sealed class LoginCommandHandler
     private readonly IIdentityService _identityService;
     private readonly IJwtTokenProvider _jwtTokenProvider;
     private readonly IRefreshTokenService _refreshTokenService;
-    private readonly ICurrentTenant _currentTenant;
+    private readonly ITenantResolver _tenantResolver;
 
     public LoginCommandHandler(
         IIdentityService identityService,
         IJwtTokenProvider jwtTokenProvider,
         IRefreshTokenService refreshTokenService,
-        ICurrentTenant currentTenant)
+        ITenantResolver tenantResolver)
     {
         _identityService = identityService;
         _jwtTokenProvider = jwtTokenProvider;
         _refreshTokenService = refreshTokenService;
-        _currentTenant = currentTenant;
+        _tenantResolver = tenantResolver;
     }
 
     public async Task<Result<LoginResponse>> Handle(
@@ -45,7 +45,7 @@ public sealed class LoginCommandHandler
             userId.Value,
             request.Email);
 
-        var organizationId = _currentTenant.OrganizationId ?? Guid.Empty;
+        var organizationId = await _tenantResolver.ResolveAsync(userId.Value, cancellationToken) ?? Guid.Empty;
 
         var refreshTokenResult = await _refreshTokenService.CreateAsync(
             userId.Value,
