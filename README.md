@@ -498,10 +498,6 @@ This project is licensed under the MIT License. See [LICENSE](LICENSE) for detai
 
 <br><br>
 
----
-
-<br>
-
 <div dir="rtl" markdown="1">
 
 # 🇮🇷 فارسی
